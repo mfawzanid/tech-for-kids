@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Count the Stars</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        /* Star field card — soft glow on the stars */
+        #sky {
+            text-shadow: 0 3px 0 rgba(253, 224, 71, 0.35), 0 6px 18px rgba(250, 204, 21, 0.45);
+        }
+
+        /* Answer buttons (created by game.js) */
+        #answers button {
+            font-family: inherit;
+            font-size: 2rem;
+            font-weight: 600;
+            padding: 0.85rem 1.75rem;
+            border: 3px solid #c7d2fe;
+            border-radius: 1.25rem;
+            background-color: #ffffff;
+            color: #4338ca;
+            cursor: pointer;
+            min-width: 4.5rem;
+            box-shadow: 0 4px 0 #c7d2fe, 0 8px 18px rgba(99, 102, 241, 0.18);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+        }
+
+        #answers button:hover {
+            transform: translateY(-2px) scale(1.05);
+            background-color: #eef2ff;
+        }
+
+        #answers button:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 0 #c7d2fe, 0 4px 10px rgba(99, 102, 241, 0.18);
+        }
+
+        #answers button.correct {
+            background-color: #4ade80;
+            border-color: #22c55e;
+            color: #052e16;
+            box-shadow: 0 4px 0 #22c55e, 0 8px 18px rgba(34, 197, 94, 0.35);
+            animation: pop 0.4s ease;
+        }
+
+        /* Feedback message */
+        #feedback {
+            font-size: 1.75rem;
+            font-weight: 600;
+            min-height: 3.25rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        #feedback.correct { color: #16a34a; }
+        #feedback.wrong { color: #f97316; }
+
+        /* Score */
+        #score {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: #6366f1;
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            30% { transform: translateY(-14px) scale(1.05); }
+            60% { transform: translateY(0) scale(0.98); }
+            80% { transform: translateY(-6px) scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(6px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+
+        #sky.bounce { animation: bounce 0.6s ease; }
+        #sky.shake { animation: shake 0.5s ease; }
+
+        @media (prefers-reduced-motion: reduce) {
+            #sky.bounce, #sky.shake, #answers button.correct {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-5 py-10 bg-gradient-to-b from-sky-200 via-sky-100 to-indigo-100 text-slate-800">
+
+    <main class="w-full max-w-xl flex flex-col items-center text-center">
+
+        <h1 class="text-4xl sm:text-5xl font-bold text-indigo-600 mb-2">⭐ Count the Stars! ⭐</h1>
+
+        <p class="text-xl sm:text-2xl font-medium text-indigo-400 mb-6">How many stars do you see?</p>
+
+        <div id="sky" class="w-full bg-white rounded-3xl shadow-xl border-4 border-sky-200 px-6 py-8 mb-7 text-6xl sm:text-7xl tracking-wider leading-relaxed break-words"></div>
+
+        <div id="answers" class="flex flex-wrap justify-center gap-4 mb-6"></div>
+
+        <div id="feedback" aria-live="polite"></div>
+
+        <div id="score" class="mb-7"></div>
+
+        <div class="flex flex-wrap justify-center gap-4">
+            <button id="btn-next" class="text-xl font-semibold px-8 py-4 bg-emerald-400 hover:bg-emerald-500 active:bg-emerald-600 text-emerald-950 rounded-2xl shadow-lg transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-emerald-300">Next Star ➡️</button>
+            <button id="btn-reset" class="text-xl font-semibold px-8 py-4 bg-sky-200 hover:bg-sky-300 active:bg-sky-400 text-sky-900 rounded-2xl shadow-lg transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-sky-300">Reset 🔄</button>
+        </div>
+
+    </main>
+
+    <script src="game.js"></script>
+</body>
+</html>

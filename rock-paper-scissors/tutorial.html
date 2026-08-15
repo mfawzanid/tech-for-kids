@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - Tutorial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* =========== RESET & VARIABLES =========== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary:        #4F46E5;
+            --color-primary-light:  #EEF2FF;
+            --color-primary-dark:   #4338CA;
+            --color-secondary:      #38BDF8;
+            --color-accent:         #FACC15;
+            --color-success:        #22C55E;
+            --color-challenge:      #A855F7;
+            --color-attention:      #FB923C;
+            --color-warning:        #F87171;
+
+            --color-goal-bg:        #EFF6FF;
+            --color-goal-border:    #3B82F6;
+            --color-tip-bg:         #FFFBEB;
+            --color-tip-border:     #F59E0B;
+            --color-result-bg:      #F0FDFA;
+            --color-result-border:  #14B8A6;
+            --color-challenge-bg:   #F5F3FF;
+            --color-challenge-border:#8B5CF6;
+            --color-important-bg:   #FFF7ED;
+            --color-important-border:#F97316;
+
+            --color-text:           #334155;
+            --color-text-secondary: #64748B;
+            --color-page-bg:        #F8FAFC;
+            --color-card-bg:        #FFFFFF;
+            --color-surface:        #F1F5F9;
+            --color-border:         #E2E8F0;
+
+            --color-code-bg:        #1E293B;
+            --color-code-text:      #F8FAFC;
+            --color-code-comment:   #94A3B8;
+
+            --rock-color:           #4F46E5;
+            --paper-color:          #F59E0B;
+            --scissors-color:       #A855F7;
+
+            --radius:       12px;
+            --radius-sm:    8px;
+            --shadow-sm:    0 2px 8px rgba(79, 70, 229, 0.06);
+            --shadow-md:    0 4px 16px rgba(79, 70, 229, 0.10);
+            --font-heading: 'Fredoka', 'Nunito', 'Comic Sans MS', cursive, sans-serif;
+            --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+            --font-code:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+        }
+
+        /* =========== BASE STYLES =========== */
+        html {
+            font-size: 17px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--color-text);
+            background-color: var(--color-page-bg);
+            padding: 40px 24px 60px;
+        }
+
+        /* =========== PAGE CONTAINER =========== */
+        .page {
+            max-width: 780px;
+            margin: 0 auto;
+            background: var(--color-card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            padding: 56px 48px;
+        }
+
+        /* =========== HEADER =========== */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 40px;
+            border-bottom: 3px dashed var(--color-border);
+            position: relative;
+        }
+
+        .header-emoji {
+            font-size: 3.5rem;
+            line-height: 1;
+            margin-bottom: 12px;
+            animation: none;
+        }
+
+        .header h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 2.6rem;
+            color: var(--color-primary);
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            font-family: var(--font-heading);
+            font-weight: 500;
+            font-size: 1.15rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .header .meta-badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-heading);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 6px 16px;
+            border-radius: 99px;
+            background: var(--color-primary-light);
+            color: var(--color-primary-dark);
+        }
+
+        .badge--yellow { background: var(--color-tip-bg); color: #A16207; }
+        .badge--blue   { background: var(--color-goal-bg);   color: #2563EB; }
+        .badge--green  { background: var(--color-result-bg);  color: #16A34A; }
+
+        /* =========== DOWNLOAD BTN =========== */
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 1.05rem;
+            padding: 12px 28px;
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            border-radius: 99px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.30);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.40);
+        }
+
+        /* =========== INTRO =========== */
+        .intro {
+            margin-bottom: 40px;
+        }
+
+        .intro p {
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
+
+        .intro strong {
+            font-weight: 600;
+            color: var(--color-primary-dark);
+        }
+
+        .intro ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 24px;
+        }
+
+        .intro li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .intro li::before {
+            content: '✊';
+            position: absolute;
+            left: 0;
+            font-size: 0.9rem;
+        }
+
+        .intro li:nth-child(2)::before { content: '✋'; }
+        .intro li:nth-child(3)::before { content: '✌️'; }
+
+        /* =========== FILE PREVIEW CARDS =========== */
+        .file-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .file-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+        }
+
+        .file-card .file-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .file-card .file-name {
+            font-family: var(--font-code);
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--color-primary-dark);
+        }
+
+        .file-card .file-desc {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        /* =========== MODULE =========== */
+        .module {
+            margin-bottom: 44px;
+            padding-top: 32px;
+            border-top: 2px solid var(--color-border);
+        }
+
+        .module:first-of-type {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        /* =========== HEADINGS =========== */
+        h2 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.7rem;
+            color: var(--color-primary-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        h2:last-of-type {
+            font-size: 2rem;
+            color: var(--color-success);
+            justify-content: center;
+            margin-top: 48px;
+        }
+
+        h3 {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--color-text);
+            margin-top: 28px;
+            margin-bottom: 10px;
+        }
+
+        /* =========== CALLOUT BOXES =========== */
+        .goal,
+        .explain,
+        .try-it,
+        .challenge {
+            position: relative;
+            padding: 18px 20px 18px 52px;
+            margin: 18px 0;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            line-height: 1.65;
+        }
+
+        .goal::before,
+        .explain::before,
+        .try-it::before,
+        .challenge::before {
+            position: absolute;
+            left: 16px;
+            top: 18px;
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+
+        .goal {
+            background: var(--color-goal-bg);
+            border: 2px solid var(--color-goal-border);
+        }
+        .goal::before { content: '🎯'; }
+                .goal strong { color: #2563EB; font-weight: 600; }
+
+        .explain {
+            background: var(--color-tip-bg);
+            border: 2px solid var(--color-tip-border);
+        }
+        .explain::before { content: '💡'; }
+                .explain strong { color: #D97706; font-weight: 600; }
+
+        .try-it {
+            background: var(--color-result-bg);
+            border: 2px solid var(--color-result-border);
+        }
+        .try-it::before { content: '✅'; }
+                .try-it strong { color: #0D9488; font-weight: 600; }
+
+        .challenge {
+            background: var(--color-challenge-bg);
+            border: 2px solid var(--color-challenge-border);
+        }
+        .challenge::before { content: '🌟'; }
+                .challenge strong { color: #7C3AED; font-weight: 600; }
+
+        /* =========== CODE BLOCKS =========== */
+        pre {
+            background: var(--color-code-bg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 18px 0;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        code {
+            font-family: var(--font-code);
+            font-weight: 400;
+            font-size: 0.875rem;
+            color: var(--color-code-text);
+        }
+
+        p code,
+        li code,
+        .goal code,
+        .explain code,
+        .try-it code,
+        .challenge code {
+            background: rgba(79, 70, 229, 0.08);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--color-primary-dark);
+        }
+
+        /* =========== LISTS =========== */
+        ul, ol {
+            margin-left: 24px;
+            margin-bottom: 18px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        /* =========== PARAGRAPHS =========== */
+        p {
+            margin-bottom: 14px;
+            font-size: 1rem;
+        }
+
+        p strong {
+            font-weight: 600;
+        }
+
+        /* =========== CONGRATS =========== */
+        .congrats-section {
+            margin-top: 48px;
+            padding: 36px 40px;
+            background: linear-gradient(135deg, var(--color-result-bg), var(--color-goal-bg));
+            border-radius: var(--radius);
+            border: 2px dashed var(--color-result-border);
+            text-align: center;
+        }
+
+        .congrats-section h2 {
+            color: var(--color-success);
+            border-bottom: none;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+
+        .congrats-section ul {
+            display: inline-block;
+            text-align: left;
+            list-style: none;
+            padding-left: 0;
+            margin-top: 12px;
+        }
+
+        .congrats-section li {
+            padding-left: 24px;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .congrats-section li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+        }
+
+        /* =========== FINAL PARAGRAPH =========== */
+        .final-note {
+            text-align: center;
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            margin-top: 16px;
+        }
+
+        /* ======================================== */
+        /* =========== PRINT / PDF STYLES ========== */
+        /* ======================================== */
+        @media print {
+            @page {
+                size: A4;
+                margin: 16mm 14mm 16mm 14mm;
+            }
+
+            html {
+                font-size: 15px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .page {
+                max-width: 100%;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            .download-btn {
+                display: none !important;
+            }
+
+            .header {
+                border-bottom-width: 2px;
+                margin-bottom: 32px;
+                padding-bottom: 24px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header-emoji {
+                font-size: 2.5rem;
+            }
+
+            .badge {
+                border: 1px solid #ccc;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+                page-break-after: avoid;
+            }
+
+            h2 .step-num {
+                width: 30px;
+                height: 30px;
+                font-size: 0.85rem;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+                page-break-after: avoid;
+                margin-top: 16px;
+            }
+
+            .module {
+                page-break-inside: avoid;
+                margin-bottom: 28px;
+                padding-top: 20px;
+                border-top-width: 1px;
+            }
+
+            p, li {
+                font-size: 0.9rem;
+            }
+
+            .goal,
+            .explain,
+            .try-it,
+            .challenge {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                font-size: 0.85rem;
+                border-width: 1px;
+                padding: 14px 16px 14px 44px;
+                margin: 12px 0;
+            }
+
+            .goal::before,
+            .explain::before,
+            .try-it::before,
+            .challenge::before {
+                left: 12px;
+                top: 14px;
+                font-size: 1.1rem;
+            }
+
+            pre {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                font-size: 0.78rem;
+                border-width: 1px;
+                padding: 14px 16px;
+                margin: 12px 0;
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+
+            code {
+                font-size: 0.78rem;
+            }
+
+            p code, li code, .goal code, .explain code, .try-it code, .challenge code {
+                font-size: 0.78rem;
+            }
+
+            .file-cards {
+                break-inside: avoid;
+            }
+
+            .file-card {
+                border-width: 1px;
+            }
+
+            .congrats-section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            /* Page break utility */
+            .page-break-before {
+                break-before: page;
+                page-break-before: always;
+            }
+
+            /* Avoid widows/orphans */
+            p, li {
+                widows: 2;
+                orphans: 2;
+            }
+
+            /* Don't break callout boxes awkwardly */
+            .goal, .explain, .try-it, .challenge, .module {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+    <!-- ====== HEADER ====== -->
+    <div class="header">
+        <div class="header-emoji">🪨 📄 ✂️</div>
+        <h1>Rock Paper Scissors</h1>
+        <p class="subtitle">A Coding Tutorial for Kids (Ages 5-8)</p>
+        <div class="meta-badges">
+            <span class="badge badge--yellow">⏱ ~45 minutes</span>
+            <span class="badge badge--blue">📘 JavaScript</span>
+            <span class="badge badge--green">👶 Ages 5-8</span>
+        </div>
+        <button class="download-btn" onclick="window.print()">📄 Download PDF</button>
+    </div>
+
+    <!-- ====== INTRO ====== -->
+    <div class="intro">
+        <p>Welcome! In this tutorial, you and your child will build a <strong>Rock Paper Scissors</strong> game together — the one you can actually play in the browser! No coding experience needed.</p>
+
+        <p>We've already prepared everything that makes the game <em>look</em> and <em>feel</em> complete: the buttons, the colors, the countdown animation, and all the wiring between them. Open <code>game.js</code> and you'll find the starter code waiting with <strong>5 TODO functions</strong> — these are the game's brain, and that's what you'll build:</p>
+
+        <p>
+            <strong>1. <code>getWinner()</code></strong> — decides who wins each round<br>
+            <strong>2. <code>updateScore()</code></strong> — shows the score on screen<br>
+            <strong>3. <code>showResult()</code></strong> — reveals the computer's choice and the result<br>
+            <strong>4. <code>playAgain()</code></strong> — clears the screen for another round<br>
+            <strong>5. <code>resetAll()</code></strong> — resets everything back to zero
+        </p>
+
+        <p>Each module below guides you through one function. After Module 3, the game comes alive — you can play!</p>
+
+        <p><strong>What's already in <code>game.js</code>?</strong></p>
+        <p>These <strong>variables</strong> are set up for you:</p>
+
+        <pre><code>playerChoice    →  stores what you picked (rock, paper, or scissors)
+computerChoice  →  stores what the computer picked
+wins            →  how many times you've won
+losses          →  how many times you've lost
+ties            →  how many ties
+isPlaying       →  stops double-clicks during the countdown</code></pre>
+
+        <p class="page-break-before"><strong>And these helper functions are already built:</strong></p>
+
+        <pre><code>getComputerChoice()   →  picks rock, paper, or scissors randomly
+getEmoji()            →  turns a word into an emoji (rock → 🪨)
+setButtonsDisabled()  →  turns the choice buttons on and off
+startCountdown()      →  runs the 3-2-1-SHOOT countdown</code></pre>
+
+        <p><strong>What you need:</strong></p>
+        <ul>
+            <li>A computer with a web browser (Chrome, Firefox, Safari, etc.)</li>
+            <li>A text editor (Notepad on Windows, TextEdit on Mac, or any code editor)</li>
+            <li>About 45 minutes total (can be split across multiple sessions)</li>
+        </ul>
+
+        <p><strong>You'll need two files:</strong></p>
+        <div class="file-cards">
+            <div class="file-card">
+                <span class="file-icon">📄</span>
+                <div>
+                    <div class="file-name">index.html</div>
+                    <div class="file-desc">Already done! Has the buttons and colors.</div>
+                </div>
+            </div>
+            <div class="file-card">
+                <span class="file-icon">⚡</span>
+                <div>
+                    <div class="file-name">game.js</div>
+                    <div class="file-desc">Starter code is ready! 5 TODO functions to fill in.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== MODULE 1 ====== -->
+    <div class="module">
+        <h2><span class="step-num">1</span> getWinner()</h2>
+
+        <div class="goal">
+            <strong>Goal:</strong> Teach the computer the rules of Rock Paper Scissors!
+        </div>
+
+        <p>Find the <code>getWinner</code> function in <code>game.js</code>. Replace the <code>TODO</code> with this code:</p>
+
+        <pre><code>function getWinner(player, computer) {
+    if (player === computer) return 'tie';
+    if (
+        (player === 'rock' && computer === 'scissors') ||
+        (player === 'paper' && computer === 'rock') ||
+        (player === 'scissors' && computer === 'paper')
+    ) {
+        return 'player';
+    }
+    return 'computer';
+}</code></pre>
+
+        <div class="explain">
+            <strong>Explain to Kids:</strong> "This function decides who wins! If both pick the same, it's a tie. Rock beats scissors, scissors beats paper, paper beats rock. The function returns <code>'player'</code> if you win, <code>'computer'</code> if the computer wins, or <code>'tie'</code> if it's a draw."
+        </div>
+
+        <div class="try-it">
+            <strong>Try It!</strong> The game won't work yet — we need <code>showResult()</code> to use this function. That's coming soon!
+        </div>
+
+        <div class="challenge">
+            <strong>Challenge:</strong> Can you explain why <code>player === 'rock' && computer === 'scissors'</code> means the player wins?
+        </div>
+    </div>
+
+    <!-- ====== MODULE 2 ====== -->
+    <div class="module">
+        <h2><span class="step-num">2</span> updateScore()</h2>
+
+        <div class="goal">
+            <strong>Goal:</strong> Show the score on the screen!
+        </div>
+
+        <p>Find the <code>updateScore</code> function. Replace the <code>TODO</code> with this:</p>
+
+        <pre><code>function updateScore() {
+    document.getElementById('score').textContent =
+        'Wins: ' + wins + ' | Losses: ' + losses + ' | Ties: ' + ties;
+}</code></pre>
+
+        <div class="explain">
+            <strong>Explain to Kids:</strong> "This function puts the score on the screen! It takes the <code>wins</code>, <code>losses</code>, and <code>ties</code> numbers and displays them on the page. Our other functions will call <code>updateScore()</code> whenever the score changes."
+        </div>
+
+        <div class="try-it">
+            <strong>Try It!</strong> Still not working yet. We need one more function to connect everything together!
+        </div>
+
+        <div class="challenge">
+            <strong>Challenge:</strong> Can you change the text from "Wins" to "Victories"? What happens?
+        </div>
+    </div>
+
+    <!-- ====== MODULE 3 ====== -->
+    <div class="module">
+        <h2><span class="step-num">3</span> showResult()</h2>
+
+        <div class="goal">
+            <strong>Goal:</strong> Show the computer's choice and the result!
+        </div>
+
+        <p>Find the <code>showResult</code> function. Replace the <code>TODO</code> with this:</p>
+
+        <pre><code>function showResult() {
+    const winner = getWinner(playerChoice, computerChoice);
+
+    document.getElementById('computer-emoji').textContent = getEmoji(computerChoice);
+
+    if (winner === 'player') {
+        wins++;
+    } else if (winner === 'computer') {
+        losses++;
+    } else {
+        ties++;
+    }
+
+    updateScore();
+
+    const centerEl = document.getElementById('center');
+    if (winner === 'player') {
+        centerEl.textContent = '🎉 You Win!';
+    } else if (winner === 'computer') {
+        centerEl.textContent = '😢 You Lose!';
+    } else {
+        centerEl.textContent = '🤝 It\'s a Tie!';
+    }
+
+    setButtonsDisabled(false);
+    isPlaying = false;
+}</code></pre>
+
+        <div class="explain">
+            <strong>Explain to Kids:</strong> "This is the big one! <code>showResult()</code> combines everything we've built: it uses <code>getWinner()</code> to figure out who won, updates the score, and shows the result in the middle of the screen. It also re-enables the buttons so you can play again!"
+        </div>
+
+        <div class="try-it">
+            <strong>Try It!</strong> NOW the game works! Pick rock, paper, or scissors and watch the countdown and result! The score even updates after each round.
+        </div>
+
+        <div class="challenge">
+            <strong>Challenge:</strong> Can you change the win message from "🎉 You Win!" to something funnier like "🎉 You're Awesome!"?
+        </div>
+    </div>
+
+    <!-- ====== MODULE 4 ====== -->
+    <div class="module">
+        <h2><span class="step-num">4</span> playAgain()</h2>
+
+        <div class="goal">
+            <strong>Goal:</strong> Clear the screen so you can play another round!
+        </div>
+
+        <p>Find the <code>playAgain</code> function. Replace the <code>TODO</code> with this:</p>
+
+        <pre><code>function playAgain() {
+    document.getElementById('player-emoji').textContent = '';
+    document.getElementById('computer-emoji').textContent = '';
+    document.getElementById('center').textContent = '';
+}</code></pre>
+
+        <div class="explain">
+            <strong>Explain to Kids:</strong> "This function clears everything on the screen so you're ready for the next round. It empties the player emoji, the computer emoji, and the center message. But notice — it does NOT reset the score! Your wins and losses stay."
+        </div>
+
+        <div class="try-it">
+            <strong>Try It!</strong> Play a few rounds, then click "Play Again." The screen clears, but your score is still there. Now play another round!
+        </div>
+
+        <div class="challenge">
+            <strong>Challenge:</strong> What happens if you click "Play Again" during the countdown?
+        </div>
+    </div>
+
+    <!-- ====== MODULE 5 ====== -->
+    <div class="module">
+        <h2><span class="step-num">5</span> resetAll()</h2>
+
+        <div class="goal">
+            <strong>Goal:</strong> Reset everything and start a fresh game!
+        </div>
+
+        <p>Find the <code>resetAll</code> function. Replace the <code>TODO</code> with this:</p>
+
+        <pre><code>function resetAll() {
+    wins = 0;
+    losses = 0;
+    ties = 0;
+    document.getElementById('player-emoji').textContent = '';
+    document.getElementById('computer-emoji').textContent = '';
+    document.getElementById('center').textContent = '';
+    updateScore();
+}</code></pre>
+
+        <div class="explain">
+            <strong>Explain to Kids:</strong> "This function does a complete reset! It sets <code>wins</code>, <code>losses</code>, and <code>ties</code> back to zero, clears the screen, and calls <code>updateScore()</code> to show the new score of 0-0-0. It's like pressing the reset button on a video game!"
+        </div>
+
+        <div class="try-it">
+            <strong>Try It!</strong> Play several rounds to build up a score. Now click "Reset All" — everything goes back to zero! Then play again to make sure the game still works.
+        </div>
+
+        <div class="challenge">
+            <strong>Challenge:</strong> Can you add a confirmation popup that asks "Are you sure?" before resetting?
+        </div>
+    </div>
+
+    <!-- ====== CONGRATS ====== -->
+    <div class="congrats-section">
+        <h2>🎉 Congratulations!</h2>
+        <p>You built a complete Rock Paper Scissors game by filling in just 5 functions! You learned:</p>
+        <ul>
+            <li><strong>getWinner()</strong> — how to use <code>if</code>/<code>else</code> to compare choices</li>
+            <li><strong>updateScore()</strong> — how to update text on the page</li>
+            <li><strong>showResult()</strong> — how to combine logic and display together</li>
+            <li><strong>playAgain()</strong> — how to clear the screen for a new round</li>
+            <li><strong>resetAll()</strong> — how to reset everything back to the start</li>
+        </ul>
+        <p class="final-note">Keep experimenting! Change colors, add sounds, make new games.<br>The possibilities are endless! 🚀</p>
+    </div>
+
+    </div><!-- /.page -->
+</body>
+</html>

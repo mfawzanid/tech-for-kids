@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #choices button {
+            font-size: 4rem;
+            padding: 20px 30px;
+            margin: 10px;
+            border: 4px solid #333;
+            border-radius: 20px;
+            background-color: #fff;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        #choices button:hover {
+            transform: scale(1.1);
+            background-color: #fffacd;
+        }
+
+        #choices button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #choices button:disabled:hover {
+            transform: none;
+            background-color: #fff;
+        }
+
+        #game-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            min-height: 120px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #player-side {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        #player-side .emoji {
+            font-size: 4rem;
+            display: block;
+            margin-top: 10px;
+        }
+
+        #center {
+            flex: 1;
+            text-align: center;
+            font-size: 2rem;
+            min-width: 150px;
+        }
+
+        #computer-side {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        #computer-side .emoji {
+            font-size: 4rem;
+            display: block;
+            margin-top: 10px;
+        }
+
+        #score {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            color: #555;
+        }
+
+        #actions {
+            margin-top: 20px;
+        }
+
+        #actions button {
+            font-size: 1.2rem;
+            padding: 12px 24px;
+            margin: 5px;
+            border: 3px solid #333;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        #btn-play-again {
+            background-color: #90ee90;
+        }
+
+        #btn-play-again:hover {
+            background-color: #7ddf7d;
+        }
+
+        #btn-reset-all {
+            background-color: #ffb6c1;
+        }
+
+        #btn-reset-all:hover {
+            background-color: #ff9aae;
+        }
+
+        #choices {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🪨 Rock Paper Scissors ✂️</h1>
+
+    <div id="choices">
+        <button id="btn-rock">🪨</button>
+        <button id="btn-paper">📄</button>
+        <button id="btn-scissors">✂️</button>
+    </div>
+
+    <div id="game-area">
+        <div id="player-side">
+            <span class="label">You</span>
+            <span class="emoji" id="player-emoji"></span>
+        </div>
+        <div id="center"></div>
+        <div id="computer-side">
+            <span class="label">Computer</span>
+            <span class="emoji" id="computer-emoji"></span>
+        </div>
+    </div>
+    <div id="score"></div>
+
+    <div id="actions">
+        <button id="btn-play-again">Play Again</button>
+        <button id="btn-reset-all">Reset All</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
