@@ -6,6 +6,7 @@ class World {
         this.powerups = [];
         this.decorations = [];
         this.lastSpawnZ = 0;
+        this.nextSpawnAt = 0;
         this.init();
     }
 
@@ -161,24 +162,26 @@ class World {
         this.decorations.push(building);
     }
 
-    update(playerZ) {
-        // Spawn new objects ahead
-        if (playerZ - 50 < this.lastSpawnZ - 20) {
-            this.lastSpawnZ -= 20;
-            this.spawnObstacle(this.lastSpawnZ);
-            this.spawnCoins(this.lastSpawnZ);
+    update(distance) {
+        // Spawn new objects ahead of the player at a fixed distance
+        const spawnGap = 15;
+        while (distance >= this.nextSpawnAt) {
+            this.nextSpawnAt += spawnGap;
+            const spawnZ = -GAME_CONFIG.SPAWN_DISTANCE;
+            this.spawnObstacle(spawnZ);
+            this.spawnCoins(spawnZ);
             
             if (Math.random() < 0.2) {
-                this.spawnPowerup(this.lastSpawnZ - 5);
+                this.spawnPowerup(spawnZ - 5);
             }
             
             if (Math.random() < 0.3) {
-                this.spawnDecoration(this.lastSpawnZ - 10);
+                this.spawnDecoration(spawnZ - 10);
             }
         }
 
         // Cleanup objects behind player
-        this.cleanup(playerZ);
+        this.cleanup();
         
         // Rotate coins
         this.coins.forEach(coin => {
@@ -196,8 +199,8 @@ class World {
         });
     }
 
-    cleanup(playerZ) {
-        const despawnZ = playerZ + GAME_CONFIG.DESPAWN_DISTANCE;
+    cleanup() {
+        const despawnZ = GAME_CONFIG.DESPAWN_DISTANCE;
         
         // Cleanup obstacles
         this.obstacles = this.obstacles.filter(obj => {
@@ -312,6 +315,7 @@ class World {
         this.powerups = [];
         this.decorations = [];
         this.lastSpawnZ = 0;
+        this.nextSpawnAt = 0;
         
         // Respawn initial objects
         this.spawnInitialObjects();

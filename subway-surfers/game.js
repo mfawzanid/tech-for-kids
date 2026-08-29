@@ -56,13 +56,13 @@ class Game {
         player.update();
 
         // Update world
-        world.update(-this.distance);
+        world.update(this.distance);
 
         // Check collisions
         this.checkCollisions();
 
         // Update camera
-        renderer.updateCamera(-this.distance);
+        renderer.updateCamera(player.mesh.position.x);
 
         // Update UI
         ui.updateScore(this.score);
@@ -70,7 +70,10 @@ class Game {
         // Render
         renderer.render();
 
-        this.animationId = requestAnimationFrame(() => this.gameLoop());
+        // Only continue loop if still playing
+        if (this.state === 'playing') {
+            this.animationId = requestAnimationFrame(() => this.gameLoop());
+        }
     }
 
     moveWorld() {
@@ -136,8 +139,10 @@ class Game {
             if (this.shieldActive) {
                 this.shieldActive = false;
                 ui.clearPowerup();
-                // Visual feedback
-                player.mesh.material && (player.mesh.material.opacity = 1);
+                // Visual feedback - reset player opacity after shield hit
+                player.mesh.traverse(child => {
+                    if (child.material) child.material.opacity = 1;
+                });
             } else {
                 this.gameOver();
             }

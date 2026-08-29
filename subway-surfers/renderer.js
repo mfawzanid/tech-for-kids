@@ -21,7 +21,7 @@ class Renderer {
             1000
         );
         this.camera.position.set(0, 5, 8);
-        this.camera.lookAt(0, 0, -10);
+        this.camera.lookAt(0, 1, -10);
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer({
@@ -66,9 +66,9 @@ class Renderer {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    updateCamera(playerZ) {
-        this.camera.position.z = playerZ + 8;
-        this.camera.lookAt(0, 0, playerZ - 10);
+    updateCamera(playerX) {
+        this.camera.position.set(playerX * 0.5, 5, 8);
+        this.camera.lookAt(playerX, 1, -10);
     }
 
     render() {
