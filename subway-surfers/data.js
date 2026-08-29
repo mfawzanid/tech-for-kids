@@ -9,7 +9,7 @@ const GAME_CONFIG = {
     GRAVITY: 0.012,
     TRACK_LENGTH: 200,
     SPAWN_DISTANCE: 100,
-    DESPAWN_DISTANCE: -20,
+    DESPAWN_DISTANCE: 20,
 };
 
 // Skin Definitions

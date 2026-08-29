@@ -126,6 +126,9 @@ class Player {
         this.mesh.add(this.rightLeg);
 
         this.mesh.position.set(0, 0, 0);
+        
+        // Add player to scene
+        renderer.scene.add(this.mesh);
     }
 
     getCurrentSkin() {
