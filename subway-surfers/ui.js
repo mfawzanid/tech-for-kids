@@ -98,7 +98,7 @@ class UI {
         
         this.saveScore(score);
         this.addCoins(coins);
-        this.updateMissions(score, coins);
+        this.updateMissions(score, coins, 0);
         
         this.overlay.innerHTML = `
             <div class="gameover-screen">
@@ -158,6 +158,7 @@ class UI {
                 const skinId = card.dataset.skin;
                 const cost = parseInt(card.dataset.cost);
                 const isUnlocked = unlockedSkins.includes(skinId);
+                const canAfford = totalCoins >= cost;
                 
                 if (isUnlocked) {
                     localStorage.setItem(STORAGE_KEYS.SELECTED_SKIN, skinId);
@@ -303,7 +304,7 @@ class UI {
         return JSON.parse(localStorage.getItem(STORAGE_KEYS.MISSIONS)) || [];
     }
 
-    updateMissions(score, coins) {
+    updateMissions(score, coins, powerupsUsed = 0) {
         const missions = this.getTodayMissions();
         missions.forEach(mission => {
             if (mission.type === 'distance') {
@@ -312,6 +313,8 @@ class UI {
                 mission.progress = (mission.progress || 0) + coins;
             } else if (mission.type === 'games') {
                 mission.progress = (mission.progress || 0) + 1;
+            } else if (mission.type === 'powerups') {
+                mission.progress = (mission.progress || 0) + powerupsUsed;
             }
         });
         localStorage.setItem(STORAGE_KEYS.MISSIONS, JSON.stringify(missions));
