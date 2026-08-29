@@ -203,6 +203,8 @@ class World {
         this.obstacles = this.obstacles.filter(obj => {
             if (obj.position.z > despawnZ) {
                 renderer.scene.remove(obj);
+                obj.geometry.dispose();
+                obj.material.dispose();
                 return false;
             }
             return true;
@@ -212,6 +214,8 @@ class World {
         this.coins = this.coins.filter(obj => {
             if (obj.position.z > despawnZ || !obj.userData.active) {
                 renderer.scene.remove(obj);
+                obj.geometry.dispose();
+                obj.material.dispose();
                 return false;
             }
             return true;
@@ -221,6 +225,8 @@ class World {
         this.powerups = this.powerups.filter(obj => {
             if (obj.position.z > despawnZ || !obj.userData.active) {
                 renderer.scene.remove(obj);
+                obj.geometry.dispose();
+                obj.material.dispose();
                 return false;
             }
             return true;
@@ -230,6 +236,8 @@ class World {
         this.decorations = this.decorations.filter(obj => {
             if (obj.position.z > despawnZ) {
                 renderer.scene.remove(obj);
+                obj.geometry.dispose();
+                obj.material.dispose();
                 return false;
             }
             return true;
@@ -281,6 +289,7 @@ class World {
         const box2 = {
             x: mesh2.position.x,
             y: mesh2.position.y,
+            z: mesh2.position.z,
             width: mesh2.geometry.parameters.width,
             height: mesh2.geometry.parameters.height,
             depth: mesh2.geometry.parameters.depth
@@ -288,15 +297,15 @@ class World {
 
         return Math.abs(box1.x - box2.x) < (box1.width + box2.width) / 2 &&
                Math.abs(box1.y - box2.y) < (box1.height + box2.height) / 2 &&
-               Math.abs(box1.depth || 0.6) < (box2.depth + 0.6) / 2 + 1;
+               Math.abs(box1.z - box2.z) < (box1.depth + box2.depth) / 2;
     }
 
     reset() {
-        // Remove all objects
-        this.obstacles.forEach(obj => renderer.scene.remove(obj));
-        this.coins.forEach(obj => renderer.scene.remove(obj));
-        this.powerups.forEach(obj => renderer.scene.remove(obj));
-        this.decorations.forEach(obj => renderer.scene.remove(obj));
+        // Remove all objects with disposal
+        this.obstacles.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
+        this.coins.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
+        this.powerups.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
+        this.decorations.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
         
         this.obstacles = [];
         this.coins = [];

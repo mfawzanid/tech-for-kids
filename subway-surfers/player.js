@@ -148,6 +148,7 @@ class Player {
         return {
             x: this.mesh.position.x,
             y: this.mesh.position.y,
+            z: this.mesh.position.z,
             width: 0.8,
             height: 2,
             depth: 0.6
