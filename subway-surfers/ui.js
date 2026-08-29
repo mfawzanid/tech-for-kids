@@ -167,6 +167,8 @@ class UI {
                     this.showSkins();
                 } else if (canAfford) {
                     this.unlockSkin(skinId, cost);
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_SKIN, skinId);
+                    player.changeSkin(skinId);
                     audioManager.playPowerup();
                     this.showSkins();
                 }

@@ -234,6 +234,7 @@ document.addEventListener('keydown', (e) => {
         }
         game.powerupTimers.forEach(id => clearTimeout(id));
         game.powerupTimers = [];
+        ui.addCoins(game.coins);
         game.state = 'menu';
         ui.showMenu();
     }
