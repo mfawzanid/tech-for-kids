@@ -17,40 +17,115 @@ class Player {
 
     createMesh() {
         const skin = this.getCurrentSkin();
-        
-        // Body
-        const bodyGeometry = new THREE.BoxGeometry(0.8, 1.2, 0.6);
-        const bodyMaterial = new THREE.MeshLambertMaterial({ color: skin.color });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        body.position.y = 0.8;
-        body.castShadow = true;
+        this.mesh = new THREE.Group();
+
+        // Materials
+        const skinMat = new THREE.MeshLambertMaterial({ color: 0xfcd9b6 });
+        const shirtMat = new THREE.MeshLambertMaterial({ color: skin.color });
+        const pantsMat = new THREE.MeshLambertMaterial({ color: 0x1e3a5f });
+        const shoeMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+        const eyeWhiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const eyeBlackMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
+        const mouthMat = new THREE.MeshLambertMaterial({ color: 0xcc6666 });
+        const hairMat = new THREE.MeshLambertMaterial({ color: 0x3d2314 });
 
         // Head
-        const headGeometry = new THREE.SphereGeometry(0.35, 16, 16);
-        const headMaterial = new THREE.MeshLambertMaterial({ color: 0xfcd9b6 });
-        const head = new THREE.Mesh(headGeometry, headMaterial);
-        head.position.y = 1.7;
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
+        head.position.y = 1.85;
         head.castShadow = true;
-
-        // Eyes
-        const eyeGeometry = new THREE.SphereGeometry(0.06, 8, 8);
-        const eyeMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
-        
-        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.12, 1.75, 0.3);
-        
-        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.12, 1.75, 0.3);
-
-        // Group
-        this.mesh = new THREE.Group();
-        this.mesh.add(body);
         this.mesh.add(head);
-        this.mesh.add(leftEye);
-        this.mesh.add(rightEye);
+
+        // Hair
+        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.15, 0.55), hairMat);
+        hair.position.y = 2.15;
+        this.mesh.add(hair);
+
+        // Eye whites
+        const eyeWhiteGeo = new THREE.BoxGeometry(0.12, 0.1, 0.05);
+        const leftEyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+        leftEyeWhite.position.set(-0.12, 1.88, 0.25);
+        this.mesh.add(leftEyeWhite);
+
+        const rightEyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+        rightEyeWhite.position.set(0.12, 1.88, 0.25);
+        this.mesh.add(rightEyeWhite);
+
+        // Pupils
+        const pupilGeo = new THREE.BoxGeometry(0.06, 0.06, 0.03);
+        const leftPupil = new THREE.Mesh(pupilGeo, eyeBlackMat);
+        leftPupil.position.set(-0.12, 1.88, 0.28);
+        this.mesh.add(leftPupil);
+
+        const rightPupil = new THREE.Mesh(pupilGeo, eyeBlackMat);
+        rightPupil.position.set(0.12, 1.88, 0.28);
+        this.mesh.add(rightPupil);
+
+        // Nose
+        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.1), skinMat);
+        nose.position.set(0, 1.82, 0.28);
+        this.mesh.add(nose);
+
+        // Mouth (smile)
+        const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.04, 0.05), mouthMat);
+        mouth.position.set(0, 1.72, 0.25);
+        this.mesh.add(mouth);
+
+        // Neck
+        const neck = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.1, 0.15), skinMat);
+        neck.position.y = 1.55;
+        this.mesh.add(neck);
+
+        // Torso (body)
+        this.body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), shirtMat);
+        this.body.position.y = 1.15;
+        this.body.castShadow = true;
+        this.mesh.add(this.body);
+
+        // Left arm
+        this.leftArm = new THREE.Group();
+        const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.18), shirtMat);
+        leftArmMesh.position.y = -0.25;
+        this.leftArm.add(leftArmMesh);
+        const leftHand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), skinMat);
+        leftHand.position.y = -0.55;
+        this.leftArm.add(leftHand);
+        this.leftArm.position.set(-0.45, 1.35, 0);
+        this.mesh.add(this.leftArm);
+
+        // Right arm
+        this.rightArm = new THREE.Group();
+        const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.18), shirtMat);
+        rightArmMesh.position.y = -0.25;
+        this.rightArm.add(rightArmMesh);
+        const rightHand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), skinMat);
+        rightHand.position.y = -0.55;
+        this.rightArm.add(rightHand);
+        this.rightArm.position.set(0.45, 1.35, 0);
+        this.mesh.add(this.rightArm);
+
+        // Left leg
+        this.leftLeg = new THREE.Group();
+        const leftLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.5, 0.2), pantsMat);
+        leftLegMesh.position.y = -0.25;
+        this.leftLeg.add(leftLegMesh);
+        const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.3), shoeMat);
+        leftShoe.position.set(0, -0.55, 0.05);
+        this.leftLeg.add(leftShoe);
+        this.leftLeg.position.set(-0.15, 0.8, 0);
+        this.mesh.add(this.leftLeg);
+
+        // Right leg
+        this.rightLeg = new THREE.Group();
+        const rightLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.5, 0.2), pantsMat);
+        rightLegMesh.position.y = -0.25;
+        this.rightLeg.add(rightLegMesh);
+        const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.3), shoeMat);
+        rightShoe.position.set(0, -0.55, 0.05);
+        this.rightLeg.add(rightShoe);
+        this.rightLeg.position.set(0.15, 0.8, 0);
+        this.mesh.add(this.rightLeg);
 
         this.mesh.position.set(0, 0, 0);
-        this.body = body;
     }
 
     getCurrentSkin() {
@@ -121,10 +196,28 @@ class Player {
             }
         }
 
-        // Running animation (bobbing)
+        // Running animation
         if (this.isGrounded && !this.isJumping) {
-            const bobAmount = Math.sin(Date.now() * 0.01) * 0.05;
-            this.body.position.y = 0.8 + bobAmount;
+            const time = Date.now() * 0.008;
+            const swing = Math.sin(time) * 0.5;
+            const bobAmount = Math.abs(Math.sin(time)) * 0.05;
+
+            // Bobbing body
+            this.body.position.y = 1.15 + bobAmount;
+
+            // Swing arms opposite to legs
+            this.leftArm.rotation.x = swing;
+            this.rightArm.rotation.x = -swing;
+
+            // Swing legs
+            this.leftLeg.rotation.x = -swing;
+            this.rightLeg.rotation.x = swing;
+        } else if (this.isJumping) {
+            // Tuck legs when jumping
+            this.leftLeg.rotation.x = -0.5;
+            this.rightLeg.rotation.x = -0.5;
+            this.leftArm.rotation.x = -0.3;
+            this.rightArm.rotation.x = -0.3;
         }
     }
 
@@ -141,6 +234,9 @@ class Player {
         const skin = SKINS.find(s => s.id === skinId);
         if (skin && this.body) {
             this.body.material.color.setHex(skin.color);
+            // Also update arm shirt color
+            this.leftArm.children[0].material.color.setHex(skin.color);
+            this.rightArm.children[0].material.color.setHex(skin.color);
         }
     }
 
