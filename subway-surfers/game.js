@@ -9,6 +9,7 @@ class Game {
         this.magnetActive = false;
         this.speedBoostActive = false;
         this.animationId = null;
+        this.powerupTimers = [];
     }
 
     start() {
@@ -20,6 +21,7 @@ class Game {
         this.shieldActive = false;
         this.magnetActive = false;
         this.speedBoostActive = false;
+        this.powerupTimers = [];
         
         player.reset();
         world.reset();
@@ -151,18 +153,20 @@ class Game {
             case 'magnet':
                 this.magnetActive = true;
                 ui.showPowerup('magnet');
-                setTimeout(() => {
+                const magnetTimer = setTimeout(() => {
                     this.magnetActive = false;
                     ui.clearPowerup();
                 }, POWERUP_TYPES.MAGNET.duration);
+                this.powerupTimers.push(magnetTimer);
                 break;
             case 'speed':
                 this.speedBoostActive = true;
                 ui.showPowerup('speed');
-                setTimeout(() => {
+                const speedTimer = setTimeout(() => {
                     this.speedBoostActive = false;
                     ui.clearPowerup();
                 }, POWERUP_TYPES.SPEED.duration);
+                this.powerupTimers.push(speedTimer);
                 break;
         }
     }
@@ -186,6 +190,8 @@ class Game {
                 cancelAnimationFrame(this.animationId);
                 this.animationId = null;
             }
+            this.powerupTimers.forEach(id => clearTimeout(id));
+            this.powerupTimers = [];
         }
     }
 
@@ -217,7 +223,13 @@ document.addEventListener('keydown', (e) => {
         game.togglePause();
     }
     if (e.code === 'Escape' && game.state === 'playing') {
-        game.pause();
+        if (game.animationId) {
+            cancelAnimationFrame(game.animationId);
+            game.animationId = null;
+        }
+        game.powerupTimers.forEach(id => clearTimeout(id));
+        game.powerupTimers = [];
+        game.state = 'menu';
         ui.showMenu();
     }
 });
