@@ -260,12 +260,28 @@ class World {
     cleanup() {
         const despawnZ = GAME_CONFIG.DESPAWN_DISTANCE;
         
+        // Helper to dispose mesh or group
+        const disposeObject = (obj) => {
+            renderer.scene.remove(obj);
+            if (obj.geometry) {
+                obj.geometry.dispose();
+            }
+            if (obj.material) {
+                if (Array.isArray(obj.material)) {
+                    obj.material.forEach(m => m.dispose());
+                } else {
+                    obj.material.dispose();
+                }
+            }
+            if (obj.children) {
+                obj.children.forEach(child => disposeObject(child));
+            }
+        };
+
         // Cleanup obstacles
         this.obstacles = this.obstacles.filter(obj => {
             if (obj.position.z > despawnZ) {
-                renderer.scene.remove(obj);
-                obj.geometry.dispose();
-                obj.material.dispose();
+                disposeObject(obj);
                 return false;
             }
             return true;
@@ -274,9 +290,7 @@ class World {
         // Cleanup coins
         this.coins = this.coins.filter(obj => {
             if (obj.position.z > despawnZ || !obj.userData.active) {
-                renderer.scene.remove(obj);
-                obj.geometry.dispose();
-                obj.material.dispose();
+                disposeObject(obj);
                 return false;
             }
             return true;
@@ -285,9 +299,7 @@ class World {
         // Cleanup powerups
         this.powerups = this.powerups.filter(obj => {
             if (obj.position.z > despawnZ || !obj.userData.active) {
-                renderer.scene.remove(obj);
-                obj.geometry.dispose();
-                obj.material.dispose();
+                disposeObject(obj);
                 return false;
             }
             return true;
@@ -296,9 +308,7 @@ class World {
         // Cleanup decorations
         this.decorations = this.decorations.filter(obj => {
             if (obj.position.z > despawnZ) {
-                renderer.scene.remove(obj);
-                obj.geometry.dispose();
-                obj.material.dispose();
+                disposeObject(obj);
                 return false;
             }
             return true;
@@ -367,11 +377,29 @@ class World {
     }
 
     reset() {
+        // Helper to dispose mesh or group
+        const disposeObject = (obj) => {
+            renderer.scene.remove(obj);
+            if (obj.geometry) {
+                obj.geometry.dispose();
+            }
+            if (obj.material) {
+                if (Array.isArray(obj.material)) {
+                    obj.material.forEach(m => m.dispose());
+                } else {
+                    obj.material.dispose();
+                }
+            }
+            if (obj.children) {
+                obj.children.forEach(child => disposeObject(child));
+            }
+        };
+
         // Remove all objects with disposal
-        this.obstacles.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
-        this.coins.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
-        this.powerups.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
-        this.decorations.forEach(obj => { renderer.scene.remove(obj); obj.geometry.dispose(); obj.material.dispose(); });
+        this.obstacles.forEach(disposeObject);
+        this.coins.forEach(disposeObject);
+        this.powerups.forEach(disposeObject);
+        this.decorations.forEach(disposeObject);
         
         this.obstacles = [];
         this.coins = [];
