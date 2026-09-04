@@ -22,9 +22,12 @@ class Game {
         this.magnetActive = false;
         this.speedBoostActive = false;
         this.powerupTimers = [];
+        this.policeCatching = false;
         
         player.reset();
         world.reset();
+        policeOfficer.reset();
+        policeOfficer.startChase();
         ui.showHUD();
         
         audioManager.resume();
@@ -61,6 +64,9 @@ class Game {
         // Check collisions
         this.checkCollisions();
 
+        // Update police officer
+        policeOfficer.update(player.mesh.position.x, player.mesh.position.z, this.policeCatching);
+
         // Update camera
         renderer.updateCamera(player.mesh.position.x);
 
@@ -69,6 +75,12 @@ class Game {
 
         // Render
         renderer.render();
+
+        // Check if police caught player
+        if (this.policeCatching && policeOfficer.catchProgress >= 1) {
+            this.gameOver();
+            return;
+        }
 
         // Only continue loop if still playing
         if (this.state === 'playing') {
@@ -135,7 +147,7 @@ class Game {
         }
 
         // Check obstacle collision
-        if (results.obstacle) {
+        if (results.obstacle && !this.policeCatching) {
             if (this.shieldActive) {
                 this.shieldActive = false;
                 ui.clearPowerup();
@@ -144,7 +156,11 @@ class Game {
                     if (child.material) child.material.opacity = 1;
                 });
             } else {
-                this.gameOver();
+                // Police officer catches the player!
+                this.policeCatching = true;
+                audioManager.playCrash();
+                // Slow down the game for dramatic effect
+                this.speed = this.speed * 0.3;
             }
         }
     }
@@ -178,12 +194,14 @@ class Game {
 
     gameOver() {
         this.state = 'gameover';
-        audioManager.playCrash();
         
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
             this.animationId = null;
         }
+        
+        policeOfficer.stopChase();
+        this.policeCatching = false;
         
         ui.showGameOver(this.score, this.coins);
     }
@@ -227,13 +245,15 @@ document.addEventListener('keydown', (e) => {
     if (e.code === 'KeyP') {
         game.togglePause();
     }
-    if (e.code === 'Escape' && game.state === 'playing') {
+    if (e.code === 'Escape' && (game.state === 'playing' || game.policeCatching)) {
         if (game.animationId) {
             cancelAnimationFrame(game.animationId);
             game.animationId = null;
         }
         game.powerupTimers.forEach(id => clearTimeout(id));
         game.powerupTimers = [];
+        policeOfficer.stopChase();
+        game.policeCatching = false;
         ui.addCoins(game.coins);
         game.state = 'menu';
         ui.showMenu();

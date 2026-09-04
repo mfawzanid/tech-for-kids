@@ -61,30 +61,88 @@ class World {
     }
 
     spawnObstacle(z) {
-        const types = Object.values(OBSTACLE_TYPES);
-        const type = types[Math.floor(Math.random() * types.length)];
         const lane = Math.floor(Math.random() * 3);
         
-        const geometry = new THREE.BoxGeometry(type.width, type.height, type.depth);
-        const material = new THREE.MeshLambertMaterial({ color: type.color });
-        const obstacle = new THREE.Mesh(geometry, material);
+        // Create a Subway Surfers style train
+        const trainGroup = new THREE.Group();
         
-        obstacle.position.set(
+        // Materials
+        const bodyBlue = new THREE.MeshLambertMaterial({ color: 0x1e3a8a }); // dark blue
+        const stripeYellow = new THREE.MeshLambertMaterial({ color: 0xfbbf24 }); // yellow
+        const windowDark = new THREE.MeshLambertMaterial({ color: 0x1f2937 }); // dark grey
+        const wheelBlack = new THREE.MeshLambertMaterial({ color: 0x111111 });
+        
+        // Main train body
+        const bodyGeo = new THREE.BoxGeometry(2, 1.6, 4);
+        const body = new THREE.Mesh(bodyGeo, bodyBlue);
+        body.position.y = 1.3;
+        body.castShadow = true;
+        body.receiveShadow = true;
+        trainGroup.add(body);
+        
+        // Yellow stripe along the side
+        const stripeGeo = new THREE.BoxGeometry(2.05, 0.15, 4);
+        const stripe = new THREE.Mesh(stripeGeo, stripeYellow);
+        stripe.position.y = 0.9;
+        trainGroup.add(stripe);
+        
+        // Windows (left side)
+        const windowGeo = new THREE.BoxGeometry(0.05, 0.5, 0.9);
+        for (let i = 0; i < 3; i++) {
+            const win = new THREE.Mesh(windowGeo, windowDark);
+            win.position.set(-1.03, 1.6, -1 + i * 1);
+            trainGroup.add(win);
+        }
+        
+        // Windows (right side)
+        for (let i = 0; i < 3; i++) {
+            const win = new THREE.Mesh(windowGeo, windowDark);
+            win.position.set(1.03, 1.6, -1 + i * 1);
+            trainGroup.add(win);
+        }
+        
+        // Front window
+        const frontWindowGeo = new THREE.BoxGeometry(1.4, 0.5, 0.05);
+        const frontWindow = new THREE.Mesh(frontWindowGeo, windowDark);
+        frontWindow.position.set(0, 1.6, -2.03);
+        trainGroup.add(frontWindow);
+        
+        // Wheels
+        const wheelGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.15, 12);
+        wheelGeo.rotateZ(Math.PI / 2);
+        const wheelPositions = [
+            [-0.8, 0.25, -1.2], [0.8, 0.25, -1.2],
+            [-0.8, 0.25, 1.2], [0.8, 0.25, 1.2]
+        ];
+        wheelPositions.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeo, wheelBlack);
+            wheel.position.set(...pos);
+            trainGroup.add(wheel);
+        });
+        
+        // Roof
+        const roofGeo = new THREE.BoxGeometry(1.8, 0.1, 3.8);
+        const roof = new THREE.Mesh(roofGeo, new THREE.MeshLambertMaterial({ color: 0x374151 }));
+        roof.position.y = 2.15;
+        trainGroup.add(roof);
+        
+        trainGroup.position.set(
             GAME_CONFIG.LANES[lane],
-            type.height / 2,
+            0,
             z
         );
-        obstacle.castShadow = true;
-        obstacle.receiveShadow = true;
         
-        obstacle.userData = {
-            type: type.id,
+        trainGroup.userData = {
+            type: 'train',
             lane: lane,
-            active: true
+            active: true,
+            width: 2,
+            height: 2.2,
+            depth: 4
         };
         
-        renderer.scene.add(obstacle);
-        this.obstacles.push(obstacle);
+        renderer.scene.add(trainGroup);
+        this.obstacles.push(trainGroup);
     }
 
     spawnCoins(z) {
@@ -289,13 +347,18 @@ class World {
     }
 
     checkBoxCollision(box1, mesh2) {
+        const isGroup = mesh2.type === 'Group';
+        const width = isGroup ? (mesh2.userData.width || 1) : mesh2.geometry.parameters.width;
+        const height = isGroup ? (mesh2.userData.height || 1) : mesh2.geometry.parameters.height;
+        const depth = isGroup ? (mesh2.userData.depth || 1) : mesh2.geometry.parameters.depth;
+        
         const box2 = {
             x: mesh2.position.x,
-            y: mesh2.position.y,
+            y: mesh2.position.y + height / 2,
             z: mesh2.position.z,
-            width: mesh2.geometry.parameters.width,
-            height: mesh2.geometry.parameters.height,
-            depth: mesh2.geometry.parameters.depth
+            width: width,
+            height: height,
+            depth: depth
         };
 
         return Math.abs(box1.x - box2.x) < (box1.width + box2.width) / 2 &&

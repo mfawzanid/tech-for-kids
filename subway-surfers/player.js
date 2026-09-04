@@ -16,18 +16,23 @@ class Player {
     }
 
     createMesh() {
-        const skin = this.getCurrentSkin();
         this.mesh = new THREE.Group();
 
-        // Materials
-        const skinMat = new THREE.MeshLambertMaterial({ color: 0xfcd9b6 });
-        const shirtMat = new THREE.MeshLambertMaterial({ color: skin.color });
-        const pantsMat = new THREE.MeshLambertMaterial({ color: 0x1e3a5f });
-        const shoeMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+        // Jake materials
+        const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a574 }); // tan skin
+        const hoodieMat = new THREE.MeshLambertMaterial({ color: 0xcccccc }); // grey hoodie
+        const vestMat = new THREE.MeshLambertMaterial({ color: 0x4a7fb5 }); // denim blue vest
+        const shirtMat = new THREE.MeshLambertMaterial({ color: 0xffffff }); // white shirt
+        const redMat = new THREE.MeshLambertMaterial({ color: 0xe63946 }); // red undershirt
+        const jeansMat = new THREE.MeshLambertMaterial({ color: 0x2b4f81 }); // blue jeans
+        const shoeGreenMat = new THREE.MeshLambertMaterial({ color: 0x2ecc71 }); // green sneakers
+        const shoeRedMat = new THREE.MeshLambertMaterial({ color: 0xe74c3c }); // red sneaker accents
         const eyeWhiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
         const eyeBlackMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
         const mouthMat = new THREE.MeshLambertMaterial({ color: 0xcc6666 });
-        const hairMat = new THREE.MeshLambertMaterial({ color: 0x3d2314 });
+        const hairMat = new THREE.MeshLambertMaterial({ color: 0x3d2314 }); // dark brown hair
+        const capMat = new THREE.MeshLambertMaterial({ color: 0xf1c40f }); // yellow cap
+        const capBrimMat = new THREE.MeshLambertMaterial({ color: 0x27ae60 }); // green cap brim
 
         // Head
         const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
@@ -35,29 +40,44 @@ class Player {
         head.castShadow = true;
         this.mesh.add(head);
 
-        // Hair
-        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.15, 0.55), hairMat);
-        hair.position.y = 2.15;
+        // Hair (under cap)
+        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.12, 0.52), hairMat);
+        hair.position.y = 2.12;
         this.mesh.add(hair);
+
+        // Cap top
+        const capTop = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.12, 0.55), capMat);
+        capTop.position.y = 2.18;
+        this.mesh.add(capTop);
+
+        // Cap brim (facing forward -z)
+        const capBrim = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.05, 0.2), capBrimMat);
+        capBrim.position.set(0, 2.12, -0.32);
+        this.mesh.add(capBrim);
+
+        // Hood (back of head)
+        const hood = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.4, 0.15), hoodieMat);
+        hood.position.set(0, 1.85, 0.32);
+        this.mesh.add(hood);
 
         // Eye whites
         const eyeWhiteGeo = new THREE.BoxGeometry(0.12, 0.1, 0.05);
         const leftEyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
-        leftEyeWhite.position.set(-0.12, 1.88, 0.25);
+        leftEyeWhite.position.set(-0.12, 1.9, 0.25);
         this.mesh.add(leftEyeWhite);
 
         const rightEyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
-        rightEyeWhite.position.set(0.12, 1.88, 0.25);
+        rightEyeWhite.position.set(0.12, 1.9, 0.25);
         this.mesh.add(rightEyeWhite);
 
         // Pupils
         const pupilGeo = new THREE.BoxGeometry(0.06, 0.06, 0.03);
         const leftPupil = new THREE.Mesh(pupilGeo, eyeBlackMat);
-        leftPupil.position.set(-0.12, 1.88, 0.28);
+        leftPupil.position.set(-0.12, 1.9, 0.28);
         this.mesh.add(leftPupil);
 
         const rightPupil = new THREE.Mesh(pupilGeo, eyeBlackMat);
-        rightPupil.position.set(0.12, 1.88, 0.28);
+        rightPupil.position.set(0.12, 1.9, 0.28);
         this.mesh.add(rightPupil);
 
         // Nose
@@ -75,17 +95,34 @@ class Player {
         neck.position.y = 1.55;
         this.mesh.add(neck);
 
-        // Torso (body)
-        this.body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), shirtMat);
+        // Red undershirt (visible at collar)
+        const undershirt = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.15, 0.05), redMat);
+        undershirt.position.set(0, 1.58, 0.18);
+        this.mesh.add(undershirt);
+
+        // Torso - white hoodie base
+        this.body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), hoodieMat);
         this.body.position.y = 1.15;
         this.body.castShadow = true;
         this.mesh.add(this.body);
 
+        // Denim vest (front panel)
+        const vest = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.5, 0.05), vestMat);
+        vest.position.set(0, 1.15, 0.18);
+        this.mesh.add(vest);
+
+        // Denim vest (back panel)
+        const vestBack = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.5, 0.05), vestMat);
+        vestBack.position.set(0, 1.15, -0.18);
+        this.mesh.add(vestBack);
+
         // Left arm
         this.leftArm = new THREE.Group();
-        const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.18), shirtMat);
+        // Hoodie sleeve
+        const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.18), hoodieMat);
         leftArmMesh.position.y = -0.25;
         this.leftArm.add(leftArmMesh);
+        // Hand
         const leftHand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), skinMat);
         leftHand.position.y = -0.55;
         this.leftArm.add(leftHand);
@@ -94,34 +131,50 @@ class Player {
 
         // Right arm
         this.rightArm = new THREE.Group();
-        const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.18), shirtMat);
+        // Hoodie sleeve
+        const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.18), hoodieMat);
         rightArmMesh.position.y = -0.25;
         this.rightArm.add(rightArmMesh);
+        // Hand
         const rightHand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), skinMat);
         rightHand.position.y = -0.55;
         this.rightArm.add(rightHand);
+        // Spray can in right hand
+        const sprayCan = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, 0.1), new THREE.MeshLambertMaterial({ color: 0x9b59b6 }));
+        sprayCan.position.set(0, -0.65, 0.1);
+        this.rightArm.add(sprayCan);
         this.rightArm.position.set(0.45, 1.35, 0);
         this.mesh.add(this.rightArm);
 
         // Left leg
         this.leftLeg = new THREE.Group();
-        const leftLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.5, 0.2), pantsMat);
+        const leftLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.5, 0.2), jeansMat);
         leftLegMesh.position.y = -0.25;
         this.leftLeg.add(leftLegMesh);
-        const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.3), shoeMat);
+        // Green sneaker
+        const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.1, 0.3), shoeGreenMat);
         leftShoe.position.set(0, -0.55, 0.05);
         this.leftLeg.add(leftShoe);
+        // Red accent on shoe
+        const leftShoeRed = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.05, 0.1), shoeRedMat);
+        leftShoeRed.position.set(0, -0.52, -0.08);
+        this.leftLeg.add(leftShoeRed);
         this.leftLeg.position.set(-0.15, 0.8, 0);
         this.mesh.add(this.leftLeg);
 
         // Right leg
         this.rightLeg = new THREE.Group();
-        const rightLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.5, 0.2), pantsMat);
+        const rightLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.5, 0.2), jeansMat);
         rightLegMesh.position.y = -0.25;
         this.rightLeg.add(rightLegMesh);
-        const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.3), shoeMat);
+        // Green sneaker
+        const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.1, 0.3), shoeGreenMat);
         rightShoe.position.set(0, -0.55, 0.05);
         this.rightLeg.add(rightShoe);
+        // Red accent on shoe
+        const rightShoeRed = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.05, 0.1), shoeRedMat);
+        rightShoeRed.position.set(0, -0.52, -0.08);
+        this.rightLeg.add(rightShoeRed);
         this.rightLeg.position.set(0.15, 0.8, 0);
         this.mesh.add(this.rightLeg);
 
@@ -236,8 +289,8 @@ class Player {
     changeSkin(skinId) {
         const skin = SKINS.find(s => s.id === skinId);
         if (skin && this.body) {
+            // Change hoodie color (main body + sleeves)
             this.body.material.color.setHex(skin.color);
-            // Also update arm shirt color
             this.leftArm.children[0].material.color.setHex(skin.color);
             this.rightArm.children[0].material.color.setHex(skin.color);
         }
