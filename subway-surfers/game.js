@@ -289,6 +289,7 @@ class Game {
 
 // Initialize game
 const game = new Game();
+window.game = game;
 
 // Show menu on load
 ui.showMenu();

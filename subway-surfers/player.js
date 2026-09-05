@@ -39,6 +39,7 @@ class Player {
             });
         }
 
+        this.hoverboardMesh = null;
         this.mesh = new THREE.Group();
 
         switch (skin.character) {
@@ -681,8 +682,8 @@ class Player {
                     break;
                 case 'KeyH':
                     e.preventDefault();
-                    if (game && game.state === 'playing' && !this.hasHoverboard) {
-                        game.activateHoverboard();
+                    if (window.game && window.game.state === 'playing' && !this.hasHoverboard) {
+                        window.game.activateHoverboard();
                     }
                     break;
             }
@@ -711,8 +712,8 @@ class Player {
         this.lastJumpTime = now;
 
         // Double-tap activates hoverboard if not already active
-        if (isDoubleTap && !this.hasHoverboard && typeof game !== 'undefined' && game && game.state === 'playing') {
-            game.activateHoverboard();
+        if (isDoubleTap && !this.hasHoverboard && window.game && window.game.state === 'playing') {
+            window.game.activateHoverboard();
             return;
         }
 
@@ -792,7 +793,7 @@ class Player {
             this.hoverboardMesh.visible = false;
         }
         // Reset player height
-        if (this.isGrounded) {
+        if (this.mesh && this.isGrounded) {
             this.mesh.position.y = 0;
         }
     }
