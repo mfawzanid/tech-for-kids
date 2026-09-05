@@ -193,12 +193,14 @@ class Game {
     }
 
     activateHoverboard() {
+        console.log('activateHoverboard called, hoverboardActive:', this.hoverboardActive);
         if (this.hoverboardActive) return;
 
         this.hoverboardActive = true;
         player.showHoverboard();
         ui.showPowerup('hoverboard');
         audioManager.playPowerup();
+        console.log('Hoverboard activated!');
 
         // Hoverboard lasts 8 seconds or until crash
         const hoverTimer = setTimeout(() => {

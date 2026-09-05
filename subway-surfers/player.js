@@ -713,6 +713,7 @@ class Player {
 
         // Double-tap activates hoverboard if not already active
         if (isDoubleTap && !this.hasHoverboard && window.game && window.game.state === 'playing') {
+            console.log('Double-tap detected! Activating hoverboard...');
             window.game.activateHoverboard();
             return;
         }
@@ -778,13 +779,20 @@ class Player {
     }
 
     showHoverboard() {
+        console.log('showHoverboard called, hoverboardMesh exists:', !!this.hoverboardMesh);
         this.hasHoverboard = true;
         if (!this.hoverboardMesh) {
+            console.log('Creating hoverboard mesh...');
             this.createHoverboard();
         }
-        this.hoverboardMesh.visible = true;
+        if (this.hoverboardMesh) {
+            this.hoverboardMesh.visible = true;
+            console.log('Hoverboard mesh set to visible');
+        }
         // Lift player slightly
-        this.mesh.position.y = 0.15;
+        if (this.mesh) {
+            this.mesh.position.y = 0.15;
+        }
     }
 
     hideHoverboard() {
