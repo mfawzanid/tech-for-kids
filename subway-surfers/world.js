@@ -269,8 +269,95 @@ class World {
             powerup.add(rightTip);
             
             powerup.castShadow = true;
+        } else if (type.id === 'shield') {
+            // Shield shape: blue shield/tameng
+            powerup = new THREE.Group();
+            
+            const shieldBlue = new THREE.MeshLambertMaterial({ 
+                color: 0x3b82f6,
+                emissive: 0x3b82f6,
+                emissiveIntensity: 0.4
+            });
+            const borderSilver = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
+            
+            // Shield top (curved part)
+            const topPart = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.1), shieldBlue);
+            topPart.position.y = 0.2;
+            powerup.add(topPart);
+            
+            // Shield bottom (pointed part)
+            const bottomPart = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.35, 0.1), shieldBlue);
+            bottomPart.position.y = -0.15;
+            powerup.add(bottomPart);
+            
+            // Border top
+            const borderTop = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.05, 0.12), borderSilver);
+            borderTop.position.y = 0.35;
+            powerup.add(borderTop);
+            
+            // Border sides
+            const borderLeft = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.35, 0.12), borderSilver);
+            borderLeft.position.set(-0.25, 0.15, 0);
+            powerup.add(borderLeft);
+            
+            const borderRight = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.35, 0.12), borderSilver);
+            borderRight.position.set(0.25, 0.15, 0);
+            powerup.add(borderRight);
+            
+            // Shield emblem (small center detail)
+            const emblem = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.05), borderSilver);
+            emblem.position.set(0, 0.1, 0.05);
+            powerup.add(emblem);
+            
+            powerup.castShadow = true;
+        } else if (type.id === 'speed') {
+            // Lightning bolt shape: yellow lightning/listrik
+            powerup = new THREE.Group();
+            
+            const boltYellow = new THREE.MeshLambertMaterial({ 
+                color: 0xfacc15,
+                emissive: 0xfacc15,
+                emissiveIntensity: 0.5
+            });
+            const boltWhite = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff,
+                emissive: 0xffffff,
+                emissiveIntensity: 0.3
+            });
+            
+            // Top part (angled down-right)
+            const topBolt = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.35, 0.1), boltYellow);
+            topBolt.position.set(0.05, 0.25, 0);
+            topBolt.rotation.z = -0.3;
+            powerup.add(topBolt);
+            
+            // Middle zigzag
+            const midBolt = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.25, 0.1), boltWhite);
+            midBolt.position.set(-0.02, 0, 0);
+            midBolt.rotation.z = 0.4;
+            powerup.add(midBolt);
+            
+            // Bottom part (angled down-left)
+            const bottomBolt = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 0.1), boltYellow);
+            bottomBolt.position.set(-0.08, -0.25, 0);
+            bottomBolt.rotation.z = -0.2;
+            powerup.add(bottomBolt);
+            
+            // Glow effect (larger faint box behind)
+            const glow = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, 0.8, 0.05),
+                new THREE.MeshLambertMaterial({ 
+                    color: 0xfacc15, 
+                    transparent: true, 
+                    opacity: 0.2 
+                })
+            );
+            glow.position.z = -0.05;
+            powerup.add(glow);
+            
+            powerup.castShadow = true;
         } else {
-            // Default crystal shape for other powerups
+            // Fallback crystal shape
             const geometry = new THREE.OctahedronGeometry(0.5);
             const material = new THREE.MeshLambertMaterial({ 
                 color: type.color,
@@ -354,7 +441,9 @@ class World {
         this.powerups.forEach(powerup => {
             if (powerup.userData.active) {
                 powerup.rotation.y += 0.05;
-                powerup.rotation.x += 0.02;
+                if (powerup.type === 'Mesh') {
+                    powerup.rotation.x += 0.02;
+                }
             }
         });
     }
