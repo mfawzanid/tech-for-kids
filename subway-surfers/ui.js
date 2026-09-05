@@ -126,7 +126,8 @@ class UI {
         
         const totalCoins = this.getTotalCoins();
         const unlockedSkins = this.getUnlockedSkins();
-        const selectedSkin = localStorage.getItem(STORAGE_KEYS.SELECTED_SKIN) || 'blue';
+        const savedSkin = localStorage.getItem(STORAGE_KEYS.SELECTED_SKIN);
+        const selectedSkin = SKINS.find(s => s.id === savedSkin) ? savedSkin : 'jake';
         
         let skinsHTML = '';
         SKINS.forEach(skin => {
@@ -261,7 +262,9 @@ class UI {
 
     getUnlockedSkins() {
         const saved = localStorage.getItem(STORAGE_KEYS.SKINS);
-        return saved ? JSON.parse(saved) : ['blue'];
+        const unlocked = saved ? JSON.parse(saved) : ['jake'];
+        // Filter out removed skin IDs that no longer exist
+        return unlocked.filter(id => SKINS.some(s => s.id === id));
     }
 
     unlockSkin(skinId, cost) {
