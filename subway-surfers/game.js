@@ -202,9 +202,11 @@ class Game {
             case 'speed':
                 this.speedBoostActive = true;
                 ui.showPowerup('speed');
+                policeOfficer.tempHide();
                 const speedTimer = setTimeout(() => {
                     this.speedBoostActive = false;
                     ui.clearPowerup();
+                    policeOfficer.tempShow();
                 }, POWERUP_TYPES.SPEED.duration);
                 this.powerupTimers.push(speedTimer);
                 break;

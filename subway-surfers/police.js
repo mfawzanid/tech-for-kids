@@ -122,6 +122,14 @@ class PoliceOfficer {
         this.catchProgress = 0;
     }
 
+    tempHide() {
+        if (this.mesh) this.mesh.visible = false;
+    }
+
+    tempShow() {
+        if (this.mesh && this.isChasing) this.mesh.visible = true;
+    }
+
     update(playerX, playerZ, isGameOver) {
         if (!this.mesh.visible) return;
 
