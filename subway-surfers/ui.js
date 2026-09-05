@@ -23,7 +23,8 @@ class UI {
             <div class="menu-screen">
                 <h1 class="menu-title">🏃 Subway Surfers 3D</h1>
                 <button class="menu-btn btn-play" id="btn-play">▶ Play</button>
-                <button class="menu-btn btn-skins" id="btn-skins">🎨 Skins (${totalCoins} coins)</button>
+                <button class="menu-btn btn-skins" id="btn-skins">🎨 Characters (${totalCoins} coins)</button>
+                <button class="menu-btn btn-skate" id="btn-skate">🛹 Skateboards (${totalCoins} coins)</button>
                 <button class="menu-btn btn-missions" id="btn-missions">📋 Missions</button>
                 <button class="menu-btn btn-leaderboard" id="btn-leaderboard">🏆 Leaderboard</button>
             </div>
@@ -37,6 +38,11 @@ class UI {
         document.getElementById('btn-skins').addEventListener('click', () => {
             audioManager.playClick();
             this.showSkins();
+        });
+
+        document.getElementById('btn-skate').addEventListener('click', () => {
+            audioManager.playClick();
+            this.showSkateboards();
         });
 
         document.getElementById('btn-missions').addEventListener('click', () => {
@@ -182,6 +188,66 @@ class UI {
         });
     }
 
+    showSkateboards() {
+        this.clearScreen();
+        this.currentScreen = 'skateboards';
+
+        const totalCoins = this.getTotalCoins();
+        const unlockedBoards = this.getUnlockedSkateboards();
+        const savedBoard = localStorage.getItem(STORAGE_KEYS.SELECTED_SKATEBOARD);
+        const selectedBoard = SKATEBOARDS.find(s => s.id === savedBoard) ? savedBoard : 'default';
+
+        let boardsHTML = '';
+        SKATEBOARDS.forEach(board => {
+            const isUnlocked = unlockedBoards.includes(board.id);
+            const isSelected = board.id === selectedBoard;
+            const canAfford = totalCoins >= board.cost;
+
+            boardsHTML += `
+                <div class="skin-card ${isSelected ? 'selected' : ''} ${!isUnlocked ? 'locked' : ''}"
+                     data-board="${board.id}" data-cost="${board.cost}">
+                    <div class="skin-preview" style="background-color: #${board.deckColor.toString(16).padStart(6, '0')}"></div>
+                    <div class="skin-name">${board.name}</div>
+                    <div class="skin-cost">${board.cost === 0 ? 'Free' : (isUnlocked ? '✓ Owned' : `🪙 ${board.cost}`)}</div>
+                </div>
+            `;
+        });
+
+        this.overlay.innerHTML = `
+            <div class="skin-screen">
+                <h1 class="menu-title" style="font-size: 2.5rem">🛹 Skateboard Shop</h1>
+                <div class="coin-display">🪙 ${totalCoins} coins</div>
+                <div class="skin-grid">${boardsHTML}</div>
+                <button class="back-btn" id="btn-back">← Back</button>
+            </div>
+        `;
+
+        document.querySelectorAll('.skin-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const boardId = card.dataset.board;
+                const cost = parseInt(card.dataset.cost);
+                const isUnlocked = unlockedBoards.includes(boardId);
+                const canAfford = totalCoins >= cost;
+
+                if (isUnlocked) {
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_SKATEBOARD, boardId);
+                    audioManager.playClick();
+                    this.showSkateboards();
+                } else if (canAfford) {
+                    this.unlockSkateboard(boardId, cost);
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_SKATEBOARD, boardId);
+                    audioManager.playPowerup();
+                    this.showSkateboards();
+                }
+            });
+        });
+
+        document.getElementById('btn-back').addEventListener('click', () => {
+            audioManager.playClick();
+            this.showMenu();
+        });
+    }
+
     showMissions() {
         this.clearScreen();
         this.currentScreen = 'missions';
@@ -274,6 +340,22 @@ class UI {
             const unlocked = this.getUnlockedSkins();
             unlocked.push(skinId);
             localStorage.setItem(STORAGE_KEYS.SKINS, JSON.stringify(unlocked));
+        }
+    }
+
+    getUnlockedSkateboards() {
+        const saved = localStorage.getItem(STORAGE_KEYS.SKATEBOARDS);
+        const unlocked = saved ? JSON.parse(saved) : ['default'];
+        return unlocked.filter(id => SKATEBOARDS.some(s => s.id === id));
+    }
+
+    unlockSkateboard(boardId, cost) {
+        const coins = this.getTotalCoins();
+        if (coins >= cost) {
+            localStorage.setItem(STORAGE_KEYS.COINS, (coins - cost).toString());
+            const unlocked = this.getUnlockedSkateboards();
+            unlocked.push(boardId);
+            localStorage.setItem(STORAGE_KEYS.SKATEBOARDS, JSON.stringify(unlocked));
         }
     }
 

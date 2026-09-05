@@ -713,7 +713,6 @@ class Player {
 
         // Double-tap activates hoverboard if not already active
         if (isDoubleTap && !this.hasHoverboard && window.game && window.game.state === 'playing') {
-            console.log('Double-tap detected! Activating hoverboard...');
             window.game.activateHoverboard();
             return;
         }
@@ -726,19 +725,25 @@ class Player {
         }
     }
 
+    getCurrentSkateboard() {
+        const saved = localStorage.getItem(STORAGE_KEYS.SELECTED_SKATEBOARD);
+        return SKATEBOARDS.find(s => s.id === saved) || SKATEBOARDS[0];
+    }
+
     createHoverboard() {
         if (this.hoverboardMesh) {
             this.mesh.remove(this.hoverboardMesh);
         }
 
+        const board = this.getCurrentSkateboard();
         this.hoverboardMesh = new THREE.Group();
 
-        const deckMat = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
-        const gripMat = new THREE.MeshLambertMaterial({ color: 0x2c2c2c });
-        const wheelMat = new THREE.MeshLambertMaterial({ color: 0x3498db });
+        const deckMat = new THREE.MeshLambertMaterial({ color: board.deckColor });
+        const gripMat = new THREE.MeshLambertMaterial({ color: board.gripColor });
+        const wheelMat = new THREE.MeshLambertMaterial({ color: board.wheelColor });
         const glowMat = new THREE.MeshLambertMaterial({
-            color: 0x60a5fa,
-            emissive: 0x60a5fa,
+            color: board.glowColor,
+            emissive: board.glowColor,
             emissiveIntensity: 0.5,
             transparent: true,
             opacity: 0.6
@@ -779,15 +784,12 @@ class Player {
     }
 
     showHoverboard() {
-        console.log('showHoverboard called, hoverboardMesh exists:', !!this.hoverboardMesh);
         this.hasHoverboard = true;
         if (!this.hoverboardMesh) {
-            console.log('Creating hoverboard mesh...');
             this.createHoverboard();
         }
         if (this.hoverboardMesh) {
             this.hoverboardMesh.visible = true;
-            console.log('Hoverboard mesh set to visible');
         }
         // Lift player slightly
         if (this.mesh) {

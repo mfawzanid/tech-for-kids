@@ -45,11 +45,22 @@ const OBSTACLE_TYPES = {
     CONE: { id: 'cone', width: 0.6, height: 1.2, depth: 0.6, color: 0xfb923c },
 };
 
+// Skateboard Definitions
+const SKATEBOARDS = [
+    { id: 'default', name: 'Default', deckColor: 0xe74c3c, wheelColor: 0x3498db, gripColor: 0x2c2c2c, glowColor: 0x60a5fa, cost: 0 },
+    { id: 'classic', name: 'Classic Wood', deckColor: 0x8B4513, wheelColor: 0xffffff, gripColor: 0x1a1a1a, glowColor: 0xcccccc, cost: 100 },
+    { id: 'pro', name: 'Pro Black', deckColor: 0x111111, wheelColor: 0xfbbf24, gripColor: 0x333333, glowColor: 0xfbbf24, cost: 250 },
+    { id: 'neon', name: 'Neon Cyber', deckColor: 0x00ffff, wheelColor: 0xff00ff, gripColor: 0x001122, glowColor: 0x00ffff, cost: 400 },
+    { id: 'fire', name: 'Fire Burst', deckColor: 0xff4500, wheelColor: 0xffd700, gripColor: 0x330000, glowColor: 0xff4500, cost: 600 },
+];
+
 // LocalStorage Keys
 const STORAGE_KEYS = {
     COINS: 'subway_coins',
     SKINS: 'subway_unlocked_skins',
     SELECTED_SKIN: 'subway_selected_skin',
+    SKATEBOARDS: 'subway_unlocked_skateboards',
+    SELECTED_SKATEBOARD: 'subway_selected_skateboard',
     SCORES: 'subway_scores',
     MISSIONS: 'subway_missions',
     MISSION_DATE: 'subway_mission_date',
