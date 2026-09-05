@@ -145,6 +145,59 @@ class World {
         this.obstacles.push(trainGroup);
     }
 
+    spawnHangingBar(z) {
+        const lane = Math.floor(Math.random() * 3);
+        
+        // Hanging bar obstacle - player must duck to pass under
+        const barGroup = new THREE.Group();
+        
+        const poleMat = new THREE.MeshLambertMaterial({ color: 0x718096 });
+        const barMat = new THREE.MeshLambertMaterial({ color: 0xf97316 }); // orange warning color
+        const stripeMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 }); // yellow stripes
+        
+        // Left pole (support from ground)
+        const leftPole = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.1), poleMat);
+        leftPole.position.set(-0.9, 1.25, 0);
+        barGroup.add(leftPole);
+        
+        // Right pole
+        const rightPole = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.1), poleMat);
+        rightPole.position.set(0.9, 1.25, 0);
+        barGroup.add(rightPole);
+        
+        // Horizontal bar (low barrier - must duck under)
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.15, 0.15), barMat);
+        bar.position.set(0, 0.7, 0);
+        barGroup.add(bar);
+        
+        // Warning stripes on bar
+        const stripe1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.16, 0.16), stripeMat);
+        stripe1.position.set(-0.5, 0.7, 0);
+        barGroup.add(stripe1);
+        
+        const stripe2 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.16, 0.16), stripeMat);
+        stripe2.position.set(0.5, 0.7, 0);
+        barGroup.add(stripe2);
+        
+        barGroup.position.set(
+            GAME_CONFIG.LANES[lane],
+            0,
+            z
+        );
+        
+        barGroup.userData = {
+            type: 'hangingBar',
+            lane: lane,
+            active: true,
+            width: 2.2,
+            height: 0.15,
+            depth: 0.15
+        };
+        
+        renderer.scene.add(barGroup);
+        this.obstacles.push(barGroup);
+    }
+
     spawnCoins(z) {
         const lane = Math.floor(Math.random() * 3);
         const count = Math.floor(Math.random() * 5) + 3;
@@ -263,14 +316,22 @@ class World {
 
     update(distance) {
         // Spawn new objects ahead of the player at a fixed distance
-        const spawnGap = 15;
+        const spawnGap = 22;
         while (distance >= this.nextSpawnAt) {
             this.nextSpawnAt += spawnGap;
             const spawnZ = -GAME_CONFIG.SPAWN_DISTANCE;
-            this.spawnObstacle(spawnZ);
+            
+            // Randomly choose obstacle type
+            const rand = Math.random();
+            if (rand < 0.6) {
+                this.spawnObstacle(spawnZ);
+            } else if (rand < 0.85) {
+                this.spawnHangingBar(spawnZ);
+            }
+            
             this.spawnCoins(spawnZ);
             
-            if (Math.random() < 0.2) {
+            if (Math.random() < 0.25) {
                 this.spawnPowerup(spawnZ - 5);
             }
             
@@ -359,6 +420,7 @@ class World {
     checkCollisions(playerPos, playerBox) {
         const results = {
             obstacle: false,
+            obstacleType: null,
             coins: [],
             powerup: null
         };
@@ -369,6 +431,7 @@ class World {
             
             if (this.checkBoxCollision(playerBox, obstacle)) {
                 results.obstacle = true;
+                results.obstacleType = obstacle.userData.type;
                 break;
             }
         }
@@ -388,7 +451,7 @@ class World {
             if (!powerup.userData.active) continue;
             
             const dist = playerPos.distanceTo(powerup.position);
-            if (dist < 1.5) {
+            if (dist < 2.5) {
                 results.powerup = powerup;
                 break;
             }

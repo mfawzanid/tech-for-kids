@@ -6,6 +6,8 @@ class Player {
         this.velocityY = 0;
         this.isJumping = false;
         this.isGrounded = true;
+        this.isDucking = false;
+        this.duckTimer = null;
         this.controls = { left: false, right: false, jump: false };
         this.init();
     }
@@ -668,6 +670,10 @@ class Player {
                 case 'KeyW':
                     this.jump();
                     break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    this.duck();
+                    break;
             }
         });
     }
@@ -689,11 +695,40 @@ class Player {
     }
 
     jump() {
-        if (this.isGrounded && !this.isJumping) {
+        if (this.isGrounded && !this.isJumping && !this.isDucking) {
             this.velocityY = GAME_CONFIG.JUMP_FORCE;
             this.isJumping = true;
             this.isGrounded = false;
             audioManager.playJump();
+        }
+    }
+
+    duck() {
+        if (!this.isGrounded || this.isJumping || this.isDucking) return;
+        
+        this.isDucking = true;
+        audioManager.playClick();
+        
+        // Scale down to look like ducking
+        if (this.mesh) {
+            this.mesh.scale.y = 0.6;
+        }
+        
+        // Auto-stand after 1.5 seconds
+        if (this.duckTimer) clearTimeout(this.duckTimer);
+        this.duckTimer = setTimeout(() => {
+            this.standUp();
+        }, 1500);
+    }
+
+    standUp() {
+        this.isDucking = false;
+        if (this.duckTimer) {
+            clearTimeout(this.duckTimer);
+            this.duckTimer = null;
+        }
+        if (this.mesh) {
+            this.mesh.scale.y = 1;
         }
     }
 
@@ -746,6 +781,7 @@ class Player {
         this.velocityY = 0;
         this.isJumping = false;
         this.isGrounded = true;
+        this.standUp(); // clear duck state
 
         // Rebuild mesh if skin changed
         const currentSkin = this.getCurrentSkin();
@@ -771,7 +807,7 @@ class Player {
             y: this.mesh.position.y,
             z: this.mesh.position.z,
             width: 0.8,
-            height: 2,
+            height: this.isDucking ? 1.0 : 2,
             depth: 0.6
         };
     }

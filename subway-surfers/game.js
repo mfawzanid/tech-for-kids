@@ -160,7 +160,14 @@ class Game {
 
         // Check obstacle collision
         if (results.obstacle && !this.policeCatching) {
-            if (this.shieldActive) {
+            // Player can jump over trains
+            const isTrain = results.obstacleType === 'train';
+            const isHangingBar = results.obstacleType === 'hangingBar';
+            const isJumpingOverTrain = isTrain && player.isJumping;
+            
+            if (isJumpingOverTrain) {
+                // Jumped over train - no collision
+            } else if (this.shieldActive) {
                 this.shieldActive = false;
                 ui.clearPowerup();
                 // Visual feedback - reset player opacity after shield hit
