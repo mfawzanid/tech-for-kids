@@ -34,7 +34,7 @@ const MISSION_TEMPLATES = [
 // Power-up Types
 const POWERUP_TYPES = {
     SHIELD: { id: 'shield', name: 'Shield', color: 0x60a5fa, duration: 0 },
-    MAGNET: { id: 'magnet', name: 'Magnet', color: 0xf472b6, duration: 5000 },
+    MAGNET: { id: 'magnet', name: 'Magnet', color: 0xf472b6, duration: 15000 },
     SPEED: { id: 'speed', name: 'Speed Boost', color: 0xfbbf24, duration: 5000 },
 };
 
