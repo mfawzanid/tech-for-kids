@@ -178,20 +178,61 @@ class World {
         const type = types[Math.floor(Math.random() * types.length)];
         const lane = Math.floor(Math.random() * 3);
         
-        const geometry = new THREE.OctahedronGeometry(0.5);
-        const material = new THREE.MeshLambertMaterial({ 
-            color: type.color,
-            emissive: type.color,
-            emissiveIntensity: 0.3
-        });
-        const powerup = new THREE.Mesh(geometry, material);
+        let powerup;
+        
+        if (type.id === 'magnet') {
+            // Magnet shape: U-shaped using boxes
+            powerup = new THREE.Group();
+            
+            const magnetMat = new THREE.MeshLambertMaterial({ 
+                color: 0xe74c3c, // bright red
+                emissive: 0xe74c3c,
+                emissiveIntensity: 0.4
+            });
+            const silverMat = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
+            
+            // Top bar
+            const topBar = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.15), magnetMat);
+            topBar.position.y = 0.35;
+            powerup.add(topBar);
+            
+            // Left pole
+            const leftPole = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), magnetMat);
+            leftPole.position.set(-0.22, 0.05, 0);
+            powerup.add(leftPole);
+            
+            // Right pole
+            const rightPole = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), magnetMat);
+            rightPole.position.set(0.22, 0.05, 0);
+            powerup.add(rightPole);
+            
+            // Silver tips (north/south poles)
+            const leftTip = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.08, 0.17), silverMat);
+            leftTip.position.set(-0.22, -0.22, 0);
+            powerup.add(leftTip);
+            
+            const rightTip = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.08, 0.17), silverMat);
+            rightTip.position.set(0.22, -0.22, 0);
+            powerup.add(rightTip);
+            
+            powerup.castShadow = true;
+        } else {
+            // Default crystal shape for other powerups
+            const geometry = new THREE.OctahedronGeometry(0.5);
+            const material = new THREE.MeshLambertMaterial({ 
+                color: type.color,
+                emissive: type.color,
+                emissiveIntensity: 0.3
+            });
+            powerup = new THREE.Mesh(geometry, material);
+            powerup.castShadow = true;
+        }
         
         powerup.position.set(
             GAME_CONFIG.LANES[lane],
             1.5,
             z
         );
-        powerup.castShadow = true;
         
         powerup.userData = {
             type: 'powerup',

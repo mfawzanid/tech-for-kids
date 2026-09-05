@@ -123,7 +123,17 @@ class Game {
                     const dist = playerPos.distanceTo(coin.position);
                     if (dist < 8) {
                         const dir = playerPos.clone().sub(coin.position).normalize();
-                        coin.position.add(dir.multiplyScalar(0.3));
+                        // Strong pull that overcomes world movement
+                        const pullStrength = Math.max(0.6, this.speed + 0.3);
+                        coin.position.add(dir.multiplyScalar(pullStrength));
+                        
+                        // Collect immediately when very close
+                        if (dist < 1.2) {
+                            coin.userData.active = false;
+                            this.coins += coin.userData.value;
+                            ui.updateCoins(this.coins);
+                            audioManager.playCoin();
+                        }
                     }
                 }
             });
@@ -131,12 +141,14 @@ class Game {
 
         const results = world.checkCollisions(playerPos, playerBox);
 
-        // Collect coins
+        // Collect coins (non-magnet or missed by magnet)
         results.coins.forEach(coin => {
-            coin.userData.active = false;
-            this.coins += coin.userData.value;
-            ui.updateCoins(this.coins);
-            audioManager.playCoin();
+            if (coin.userData.active) {
+                coin.userData.active = false;
+                this.coins += coin.userData.value;
+                ui.updateCoins(this.coins);
+                audioManager.playCoin();
+            }
         });
 
         // Collect powerups
