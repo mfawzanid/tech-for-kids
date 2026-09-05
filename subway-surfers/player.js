@@ -8,6 +8,9 @@ class Player {
         this.isGrounded = true;
         this.isDucking = false;
         this.duckTimer = null;
+        this.lastJumpTime = 0;
+        this.hoverboardMesh = null;
+        this.hasHoverboard = false;
         this.controls = { left: false, right: false, jump: false };
         this.init();
     }
@@ -695,11 +698,94 @@ class Player {
     }
 
     jump() {
+        const now = Date.now();
+        const isDoubleTap = now - this.lastJumpTime < 300;
+        this.lastJumpTime = now;
+
+        // Double-tap activates hoverboard if not already active
+        if (isDoubleTap && !this.hasHoverboard && game && game.state === 'playing') {
+            game.activateHoverboard();
+            return;
+        }
+
         if (this.isGrounded && !this.isJumping && !this.isDucking) {
             this.velocityY = GAME_CONFIG.JUMP_FORCE;
             this.isJumping = true;
             this.isGrounded = false;
             audioManager.playJump();
+        }
+    }
+
+    createHoverboard() {
+        if (this.hoverboardMesh) {
+            this.mesh.remove(this.hoverboardMesh);
+        }
+
+        this.hoverboardMesh = new THREE.Group();
+
+        const deckMat = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
+        const gripMat = new THREE.MeshLambertMaterial({ color: 0x2c2c2c });
+        const wheelMat = new THREE.MeshLambertMaterial({ color: 0x3498db });
+        const glowMat = new THREE.MeshLambertMaterial({
+            color: 0x60a5fa,
+            emissive: 0x60a5fa,
+            emissiveIntensity: 0.5,
+            transparent: true,
+            opacity: 0.6
+        });
+
+        // Main deck
+        const deck = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 1.2), deckMat);
+        deck.position.y = -0.05;
+        this.hoverboardMesh.add(deck);
+
+        // Grip tape
+        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.07, 1.0), gripMat);
+        grip.position.y = -0.05;
+        this.hoverboardMesh.add(grip);
+
+        // Wheels (4 small cylinders)
+        const wheelGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.06, 8);
+        wheelGeo.rotateZ(Math.PI / 2);
+        const wheelPositions = [
+            [-0.22, -0.15, -0.4],
+            [0.22, -0.15, -0.4],
+            [-0.22, -0.15, 0.4],
+            [0.22, -0.15, 0.4]
+        ];
+        wheelPositions.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+            wheel.position.set(...pos);
+            this.hoverboardMesh.add(wheel);
+        });
+
+        // Hover glow (trail effect underneath)
+        const glow = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.02, 1.3), glowMat);
+        glow.position.y = -0.2;
+        this.hoverboardMesh.add(glow);
+
+        this.hoverboardMesh.visible = false;
+        this.mesh.add(this.hoverboardMesh);
+    }
+
+    showHoverboard() {
+        this.hasHoverboard = true;
+        if (!this.hoverboardMesh) {
+            this.createHoverboard();
+        }
+        this.hoverboardMesh.visible = true;
+        // Lift player slightly
+        this.mesh.position.y = 0.15;
+    }
+
+    hideHoverboard() {
+        this.hasHoverboard = false;
+        if (this.hoverboardMesh) {
+            this.hoverboardMesh.visible = false;
+        }
+        // Reset player height
+        if (this.isGrounded) {
+            this.mesh.position.y = 0;
         }
     }
 
@@ -766,12 +852,24 @@ class Player {
             // Swing legs
             this.leftLeg.rotation.x = -swing;
             this.rightLeg.rotation.x = swing;
+
+            // Hoverboard tilt animation
+            if (this.hasHoverboard && this.hoverboardMesh) {
+                this.hoverboardMesh.rotation.z = Math.sin(time * 0.5) * 0.05;
+                this.hoverboardMesh.rotation.x = Math.sin(time * 0.3) * 0.03;
+            }
         } else if (this.isJumping) {
             // Tuck legs when jumping
             this.leftLeg.rotation.x = -0.5;
             this.rightLeg.rotation.x = -0.5;
             this.leftArm.rotation.x = -0.3;
             this.rightArm.rotation.x = -0.3;
+
+            // Hoverboard follows jump tilt
+            if (this.hasHoverboard && this.hoverboardMesh) {
+                this.hoverboardMesh.rotation.x = -0.2;
+                this.hoverboardMesh.rotation.z = 0;
+            }
         }
     }
 
@@ -781,7 +879,9 @@ class Player {
         this.velocityY = 0;
         this.isJumping = false;
         this.isGrounded = true;
+        this.lastJumpTime = 0;
         this.standUp(); // clear duck state
+        this.hideHoverboard(); // clear hoverboard
 
         // Rebuild mesh if skin changed
         const currentSkin = this.getCurrentSkin();

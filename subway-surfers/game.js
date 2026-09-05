@@ -8,6 +8,7 @@ class Game {
         this.shieldActive = false;
         this.magnetActive = false;
         this.speedBoostActive = false;
+        this.hoverboardActive = false;
         this.animationId = null;
         this.powerupTimers = [];
     }
@@ -21,6 +22,7 @@ class Game {
         this.shieldActive = false;
         this.magnetActive = false;
         this.speedBoostActive = false;
+        this.hoverboardActive = false;
         this.powerupTimers = [];
         this.policeCatching = false;
         
@@ -42,11 +44,13 @@ class Game {
         if (this.state !== 'playing') return;
 
         // Update speed
+        let targetSpeed = GAME_CONFIG.MAX_SPEED;
         if (this.speedBoostActive) {
-            this.speed = Math.min(GAME_CONFIG.MAX_SPEED * 2, this.speed + GAME_CONFIG.SPEED_INCREMENT * 3);
-        } else {
-            this.speed = Math.min(GAME_CONFIG.MAX_SPEED, this.speed + GAME_CONFIG.SPEED_INCREMENT);
+            targetSpeed = GAME_CONFIG.MAX_SPEED * 2;
+        } else if (this.hoverboardActive) {
+            targetSpeed = GAME_CONFIG.MAX_SPEED * 1.3;
         }
+        this.speed = Math.min(targetSpeed, this.speed + GAME_CONFIG.SPEED_INCREMENT);
 
         // Update distance and score
         this.distance += this.speed;
@@ -167,6 +171,10 @@ class Game {
             
             if (isJumpingOverTrain) {
                 // Jumped over train - no collision
+            } else if (this.hoverboardActive) {
+                // Hoverboard breaks on impact, protecting player
+                this.deactivateHoverboard();
+                audioManager.playCrash();
             } else if (this.shieldActive) {
                 this.shieldActive = false;
                 ui.clearPowerup();
@@ -182,6 +190,29 @@ class Game {
                 this.speed = this.speed * 0.3;
             }
         }
+    }
+
+    activateHoverboard() {
+        if (this.hoverboardActive) return;
+
+        this.hoverboardActive = true;
+        player.showHoverboard();
+        ui.showPowerup('hoverboard');
+        audioManager.playPowerup();
+
+        // Hoverboard lasts 8 seconds or until crash
+        const hoverTimer = setTimeout(() => {
+            this.deactivateHoverboard();
+        }, 8000);
+        this.powerupTimers.push(hoverTimer);
+    }
+
+    deactivateHoverboard() {
+        if (!this.hoverboardActive) return;
+
+        this.hoverboardActive = false;
+        player.hideHoverboard();
+        ui.clearPowerup();
     }
 
     activatePowerup(type) {
@@ -215,15 +246,16 @@ class Game {
 
     gameOver() {
         this.state = 'gameover';
-        
+
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
             this.animationId = null;
         }
-        
+
         policeOfficer.stopChase();
         this.policeCatching = false;
-        
+        this.deactivateHoverboard();
+
         ui.showGameOver(this.score, this.coins);
     }
 
@@ -275,6 +307,7 @@ document.addEventListener('keydown', (e) => {
         game.powerupTimers = [];
         policeOfficer.stopChase();
         game.policeCatching = false;
+        game.deactivateHoverboard();
         ui.addCoins(game.coins);
         game.state = 'menu';
         ui.showMenu();

@@ -81,7 +81,7 @@ class UI {
 
     showPowerup(type) {
         if (this.powerupEl) {
-            const icons = { shield: '🛡️', magnet: '🧲', speed: '⚡' };
+            const icons = { shield: '🛡️', magnet: '🧲', speed: '⚡', hoverboard: '🛹' };
             this.powerupEl.textContent = icons[type] || '';
         }
     }
