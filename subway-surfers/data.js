@@ -14,11 +14,12 @@ const GAME_CONFIG = {
 
 // Skin Definitions
 const SKINS = [
-    { id: 'blue', name: 'Blue Runner', color: 0x3b82f6, cost: 0, unlocked: true },
-    { id: 'red', name: 'Red Blaze', color: 0xef4444, cost: 50, unlocked: false },
-    { id: 'green', name: 'Green Turbo', color: 0x22c55e, cost: 100, unlocked: false },
-    { id: 'gold', name: 'Gold Master', color: 0xfbbf24, cost: 200, unlocked: false },
-    { id: 'rainbow', name: 'Rainbow Dash', color: 0xffffff, cost: 500, unlocked: false },
+    { id: 'blue', name: 'Blue Runner', color: 0x3b82f6, cost: 0, character: 'jake' },
+    { id: 'red', name: 'Red Blaze', color: 0xef4444, cost: 50, character: 'jake' },
+    { id: 'green', name: 'Green Turbo', color: 0x22c55e, cost: 100, character: 'jake' },
+    { id: 'gold', name: 'Gold Master', color: 0xfbbf24, cost: 200, character: 'jake' },
+    { id: 'rainbow', name: 'Rainbow Dash', color: 0xffffff, cost: 500, character: 'jake' },
+    { id: 'fresh', name: 'Fresh', color: 0x10b981, cost: 300, character: 'fresh' },
 ];
 
 // Mission Templates
