@@ -671,11 +671,19 @@ class Player {
                 case 'Space':
                 case 'ArrowUp':
                 case 'KeyW':
+                    e.preventDefault();
                     this.jump();
                     break;
                 case 'ArrowDown':
                 case 'KeyS':
+                    e.preventDefault();
                     this.duck();
+                    break;
+                case 'KeyH':
+                    e.preventDefault();
+                    if (game && game.state === 'playing' && !this.hasHoverboard) {
+                        game.activateHoverboard();
+                    }
                     break;
             }
         });
@@ -699,11 +707,11 @@ class Player {
 
     jump() {
         const now = Date.now();
-        const isDoubleTap = now - this.lastJumpTime < 300;
+        const isDoubleTap = now - this.lastJumpTime < 500;
         this.lastJumpTime = now;
 
         // Double-tap activates hoverboard if not already active
-        if (isDoubleTap && !this.hasHoverboard && game && game.state === 'playing') {
+        if (isDoubleTap && !this.hasHoverboard && typeof game !== 'undefined' && game && game.state === 'playing') {
             game.activateHoverboard();
             return;
         }
