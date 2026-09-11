@@ -18,6 +18,7 @@ class Player {
     init() {
         this.createMesh();
         this.setupControls();
+        this.setupTouchControls();
     }
 
     createMesh() {
@@ -717,12 +718,61 @@ class Player {
             return;
         }
 
+        this.doJump();
+    }
+
+    doJump() {
         if (this.isGrounded && !this.isJumping && !this.isDucking) {
             this.velocityY = GAME_CONFIG.JUMP_FORCE;
             this.isJumping = true;
             this.isGrounded = false;
             audioManager.playJump();
         }
+    }
+
+    setupTouchControls() {
+        const canvas = document.getElementById('game-canvas');
+        let startX = 0, startY = 0, lastTap = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const dx = endX - startX;
+            const dy = endY - startY;
+            const now = Date.now();
+
+            const isSwipe = Math.abs(dx) > 30 || Math.abs(dy) > 30;
+
+            if (!isSwipe) {
+                // Tap — double-tap activates hoverboard
+                if (now - lastTap < 500) {
+                    if (window.game && window.game.state === 'playing' && !this.hasHoverboard) {
+                        window.game.activateHoverboard();
+                    }
+                    lastTap = 0;
+                } else {
+                    lastTap = now;
+                }
+                return;
+            }
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal swipe
+                if (dx > 0) this.moveRight();
+                else this.moveLeft();
+            } else {
+                // Vertical swipe
+                if (dy < 0) this.doJump();
+                else this.duck();
+            }
+        }, { passive: false });
     }
 
     getCurrentSkateboard() {
@@ -785,9 +835,8 @@ class Player {
 
     showHoverboard() {
         this.hasHoverboard = true;
-        if (!this.hoverboardMesh) {
-            this.createHoverboard();
-        }
+        // Always rebuild so current skateboard colors are used
+        this.createHoverboard();
         if (this.hoverboardMesh) {
             this.hoverboardMesh.visible = true;
         }
@@ -801,6 +850,8 @@ class Player {
         this.hasHoverboard = false;
         if (this.hoverboardMesh) {
             this.hoverboardMesh.visible = false;
+            // Clear mesh so next activation rebuilds with current colors
+            this.hoverboardMesh = null;
         }
         // Reset player height
         if (this.mesh && this.isGrounded) {

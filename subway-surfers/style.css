@@ -8,18 +8,23 @@ body {
     font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
     overflow: hidden;
     background: #1a1a2e;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 #game-container {
     position: relative;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
 }
 
 #game-canvas {
     display: block;
     width: 100%;
     height: 100%;
+    touch-action: none;
 }
 
 #ui-overlay {
@@ -33,6 +38,11 @@ body {
 
 #ui-overlay > * {
     pointer-events: auto;
+}
+
+/* HUD should not block touch swipes */
+#hud {
+    pointer-events: none;
 }
 
 /* HUD */
@@ -332,4 +342,82 @@ body {
     border-radius: 25px;
     font-size: 1.3rem;
     font-weight: 600;
+}
+
+/* Mobile / Touch Devices */
+@media (max-width: 600px) {
+    .menu-title {
+        font-size: 2.2rem;
+        margin-bottom: 25px;
+    }
+
+    .menu-btn {
+        font-size: 1.1rem;
+        padding: 14px 25px;
+        min-width: 200px;
+        margin: 6px;
+    }
+
+    #hud {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        font-size: 1rem;
+    }
+
+    .hud-item {
+        padding: 6px 14px;
+    }
+
+    .skin-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 20px 0;
+        padding: 0 15px;
+    }
+
+    .skin-card {
+        padding: 12px;
+    }
+
+    .skin-preview {
+        width: 45px;
+        height: 45px;
+    }
+
+    .skin-name {
+        font-size: 0.95rem;
+    }
+
+    .skin-cost {
+        font-size: 0.8rem;
+    }
+
+    .skin-screen,
+    .missions-screen,
+    .leaderboard-screen {
+        overflow-y: auto;
+        justify-content: flex-start;
+        padding-top: 80px;
+    }
+
+    .mission-list,
+    .leaderboard-list {
+        min-width: 260px;
+        max-width: 90vw;
+    }
+
+    .gameover-title {
+        font-size: 2.2rem;
+    }
+
+    .gameover-score {
+        font-size: 1.4rem;
+    }
+
+    .coin-display {
+        font-size: 1rem;
+        padding: 8px 18px;
+        top: 10px;
+    }
 }

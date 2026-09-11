@@ -29,18 +29,20 @@ class Renderer {
             antialias: true
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // Lower pixel ratio on mobile for performance
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 600;
+        this.renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         // Lighting
-        this.setupLighting();
+        this.setupLighting(isMobile);
 
         // Handle resize
         window.addEventListener('resize', () => this.onResize());
     }
 
-    setupLighting() {
+    setupLighting(isMobile = false) {
         // Ambient light
         const ambient = new THREE.AmbientLight(0xffffff, 0.6);
         this.scene.add(ambient);
@@ -49,8 +51,9 @@ class Renderer {
         const directional = new THREE.DirectionalLight(0xffffff, 0.8);
         directional.position.set(10, 20, 10);
         directional.castShadow = true;
-        directional.shadow.mapSize.width = 2048;
-        directional.shadow.mapSize.height = 2048;
+        const shadowSize = isMobile ? 1024 : 2048;
+        directional.shadow.mapSize.width = shadowSize;
+        directional.shadow.mapSize.height = shadowSize;
         directional.shadow.camera.near = 0.5;
         directional.shadow.camera.far = 50;
         directional.shadow.camera.left = -15;
